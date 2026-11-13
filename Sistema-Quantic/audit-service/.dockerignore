@@ -1,0 +1,6 @@
+.venv
+.env
+*.local.json
+__pycache__
+.pytest_cache
+tests

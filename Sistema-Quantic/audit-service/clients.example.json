@@ -1,0 +1,4 @@
+[
+  {"id":"inventory-writer","source":"inventory","scopes":["events:write"],"key_sha256":"REEMPLAZAR_POR_SHA256_DE_UNA_CLAVE_ALEATORIA"},
+  {"id":"inventory-reader","source":"inventory","scopes":["events:read"],"key_sha256":"REEMPLAZAR_POR_SHA256_DE_OTRA_CLAVE_ALEATORIA"}
+]

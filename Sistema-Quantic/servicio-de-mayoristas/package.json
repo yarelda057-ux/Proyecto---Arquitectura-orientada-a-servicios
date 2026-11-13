@@ -1,0 +1,26 @@
+{
+  "name": "servicio-de-gestion-de-stock-de-mayoristas",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "node --test tests/*.test.js",
+    "test:integration": "node tests/integration.js",
+    "create-admin": "node scripts/create-admin.js",
+    "migrate": "node scripts/migrate.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongoose": "^8.18.1",
+    "exceljs": "^4.4.0",
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^17.2.2",
+    "cors": "^2.8.5"
+  }
+}

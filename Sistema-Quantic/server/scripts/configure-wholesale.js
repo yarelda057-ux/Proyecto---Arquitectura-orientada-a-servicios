@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import { randomBytes } from 'node:crypto';
+const serviceEnv = new URL('../../servicio-de-mayoristas/.env', import.meta.url);
+const serverEnv = new URL('../.env', import.meta.url);
+if (fs.existsSync(serviceEnv)) throw new Error('Ya existe .env del servicio. No se sobrescribe.');
+const prior = fs.readFileSync(serverEnv, 'utf8');
+if (/^WHOLESALE_/m.test(prior)) throw new Error('La integración ya está configurada.');
+const key = randomBytes(48).toString('hex');
+fs.writeFileSync(serviceEnv, 'PORT=3001\nMONGODB_URI=mongodb://127.0.0.1:27017/mayoristas\nJWT_SECRET=' + randomBytes(48).toString('hex') + '\nINTEGRATION_KEY=' + key + '\n');
+fs.appendFileSync(serverEnv, '\nWHOLESALE_SERVICE_URL=http://127.0.0.1:3001\nWHOLESALE_INTEGRATION_KEY=' + key + '\n');
+console.log('Configuración local creada sin mostrar secretos.');

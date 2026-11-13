@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quantic Technology | Directorio de Proveedores y Servicios TI en Perú</title>
+  <meta name="description" content="Directorio comercial de empresas y servicios tecnológicos verificados en el Perú por Quantic Technology S.A.C.">
+  
+  <!-- Tipografías elegantes Google Fonts: Outfit (moderna), Plus Jakarta Sans (precisa) y Playfair Display (editorial) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Elementos decorativos de fondo con desenfoque etéreo (Efecto Glassmorphism y Orbes) -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- ========================================================================= -->
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR (Flotante, estilo Glassmorphic)              -->
+  <!-- ========================================================================= -->
+  <header class="navbar-wrapper">
+    <div class="navbar-capsule">
+      <div class="brand">
+        <div class="brand-symbol">
+          <span class="symbol-core">⚡</span>
+          <div class="symbol-ring"></div>
+        </div>
+        <div class="brand-info">
+          <span class="brand-title">Quantic<span class="brand-highlight">Tech</span></span>
+          <span class="brand-tag">Directorio Comercial TI &bull; Perú</span>
+        </div>
+      </div>
+
+      <!-- Navegación por pestañas estilizadas -->
+      <nav class="nav-links">
+        <button class="nav-btn active" data-tab="catalogo-servicios">
+          <span class="btn-icon">✨</span> Explorar Catálogo
+        </button>
+        <button class="nav-btn" data-tab="empresas-directorio">
+          <span class="btn-icon">🏢</span> Proveedores
+        </button>
+        <button class="nav-btn" data-tab="registro-empresa">
+          <span class="btn-icon">✍️</span> Inscribir Empresa
+        </button>
+        <button class="nav-btn" data-tab="registro-servicio">
+          <span class="btn-icon">➕</span> Nuevo Servicio
+        </button>
+        <button class="nav-btn nav-btn-empresa" data-tab="portal-empresa" title="Acceso privado para empresas proveedoras">
+          <span class="btn-icon">💼</span> Portal Empresa
+        </button>
+        <button class="nav-btn nav-btn-admin" data-tab="panel-admin-demo">
+          <span class="btn-icon">🛡️</span> Panel Admin <span class="admin-pill">DEMO</span>
+        </button>
+      </nav>
+
+      <!-- Estado de la base de datos MySQL -->
+      <div class="db-pill" id="dbStatusBadge" title="Comprobando base de datos MySQL...">
+        <span class="db-dot"></span>
+        <span id="dbStatusText">Verificando BD...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- CONTENEDOR PRINCIPAL                                                      -->
+  <!-- ========================================================================= -->
+  <main class="main-wrapper">
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- VISTA 1: CATÁLOGO PRINCIPAL Y EXPLORACIÓN                             -->
+    <!-- --------------------------------------------------------------------- -->
+    <section id="tab-catalogo-servicios" class="view-panel active">
+      
+      <!-- HERO SECTION ELEGANTE Y DECORADO -->
+      <div class="hero-showcase">
+        <div class="hero-content">
+          <div class="hero-chip">
+            <span class="sparkle">✦</span> DIRECTORIO COMERCIAL EXCLUSIVO &bull; PERÚ
+          </div>
+          
+          <h1 class="hero-heading">
+            Soluciones Tecnológicas <br>
+            <span class="hero-heading-italic">a tu alcance.</span>
+          </h1>
+          
+          <p class="hero-lead">
+            Conecte directamente con empresas peruanas verificadas para soporte técnico, cableado, ciberseguridad y consultoría informática. Información transparente, sin intermediarios.
+          </p>
+
+          <!-- Estadísticas Rápidas de Confianza (Estilo Travorra) -->
+          <div class="hero-stats-strip">
+            <div class="stat-bubble">
+              <span class="stat-number">100%</span>
+              <span class="stat-label">Proveedores Verificados</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-bubble">
+              <span class="stat-number">4+</span>
+              <span class="stat-label">Áreas Especializadas</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-bubble">
+              <span class="stat-number">Nacional</span>
+              <span class="stat-label">Lima, Arequipa y Provincias</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Elemento 3D Visual Decorativo (Orbe Cristalino & Tarjetas Flotantes) -->
+        <div class="hero-visual-3d">
+          <div class="crystal-orb-container">
+            <div class="crystal-glow"></div>
+            <div class="crystal-sphere">
+              <div class="sphere-texture"></div>
+              <div class="sphere-specular"></div>
+            </div>
+            <div class="orbiting-ring ring-1"></div>
+            <div class="orbiting-ring ring-2"></div>
+
+            <!-- Tarjetas Flotantes Interactivas (Estilo ClassiAds / Travorra) -->
+            <div class="floating-card float-top">
+              <div class="float-icon">✓</div>
+              <div class="float-text">
+                <strong>Empresa Verificada</strong>
+                <small>Revisión técnica Quantic</small>
+              </div>
+            </div>
+
+            <div class="floating-card float-bottom">
+              <div class="float-icon-star">★</div>
+              <div class="float-text">
+                <strong>Atención Directa</strong>
+                <small>WhatsApp y llamada inmediata</small>
+              </div>
+            </div>
+
+            <div class="floating-badge float-side">
+              <span>🇵🇪 Red Empresarial Perú</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CÁPSULA DE BÚSQUEDA Y FILTRADO AVANZADO (Inspirado en la imagen Travorra) -->
+      <div class="search-capsule-wrapper">
+        <div class="search-capsule">
+          
+          <!-- Segmento 1: Texto libre -->
+          <div class="capsule-segment segment-search">
+            <span class="segment-icon">🔍</span>
+            <div class="segment-body">
+              <label for="searchQuery">¿Qué servicio buscas?</label>
+              <input type="text" id="searchQuery" placeholder="Ej: Computadoras, Servidores, Fibra..." autocomplete="off">
+            </div>
+            <button id="btnClearSearch" class="capsule-clear-btn" title="Limpiar" style="display: none;">&times;</button>
+          </div>
+
+          <div class="capsule-divider"></div>
+
+          <!-- Segmento 2: Categoría -->
+          <div class="capsule-segment">
+            <span class="segment-icon">📂</span>
+            <div class="segment-body">
+              <label for="filterCategoria">Categoría</label>
+              <select id="filterCategoria">
+                <option value="">Todas las categorías</option>
+                <option value="Soporte técnico">Soporte técnico</option>
+                <option value="Redes e infraestructura">Redes e infraestructura</option>
+                <option value="Ciberseguridad">Ciberseguridad</option>
+                <option value="Consultoría tecnológica">Consultoría tecnológica</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="capsule-divider"></div>
+
+          <!-- Segmento 3: Ciudad -->
+          <div class="capsule-segment">
+            <span class="segment-icon">📍</span>
+            <div class="segment-body">
+              <label for="filterCiudad">Región / Ciudad</label>
+              <select id="filterCiudad">
+                <option value="">Todo el Perú</option>
+                <option value="Lima">Lima y Callao</option>
+                <option value="Arequipa">Arequipa</option>
+                <option value="Trujillo">Trujillo (La Libertad)</option>
+                <option value="Chiclayo">Chiclayo (Lambayeque)</option>
+                <option value="Piura">Piura</option>
+                <option value="Cusco">Cusco</option>
+                <option value="Huancayo">Huancayo (Junín)</option>
+                <option value="Iquitos">Iquitos (Loreto)</option>
+                <option value="Tacna">Tacna</option>
+                <option value="Chimbote">Chimbote (Áncash)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="capsule-divider"></div>
+
+          <!-- Segmento 4: Modalidad -->
+          <div class="capsule-segment">
+            <span class="segment-icon">💻</span>
+            <div class="segment-body">
+              <label for="filterTipoServicio">Modalidad</label>
+              <select id="filterTipoServicio">
+                <option value="">Cualquiera</option>
+                <option value="Presencial">Presencial</option>
+                <option value="Remoto">Remoto</option>
+                <option value="Híbrido">Híbrido</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Botón de Ejecución Circular -->
+          <div class="capsule-action">
+            <button class="capsule-btn-search" id="btnExecuteSearch" title="Filtrar catálogo">
+              <span class="search-btn-icon">⚡</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TARJETAS DE CATEGORÍA RÁPIDA (Estilo ClassiAds) -->
+      <div class="categories-showcase">
+        <div class="section-title-wrap">
+          <h2 class="subheading-title">Especialidades Destacadas</h2>
+          <span class="subheading-note">Haga clic en una categoría para explorar</span>
+        </div>
+
+        <div class="category-cards-grid">
+          
+          <div class="cat-pill-card active" data-cat="">
+            <div class="cat-icon-box box-all">✨</div>
+            <div class="cat-details">
+              <h4>Todos</h4>
+              <p>Ver catálogo global</p>
+            </div>
+          </div>
+
+          <div class="cat-pill-card" data-cat="Soporte técnico">
+            <div class="cat-icon-box box-soporte">🛠️</div>
+            <div class="cat-details">
+              <h4>Soporte Técnico</h4>
+              <p>Mantenimiento & PCs</p>
+            </div>
+          </div>
+
+          <div class="cat-pill-card" data-cat="Redes e infraestructura">
+            <div class="cat-icon-box box-redes">🌐</div>
+            <div class="cat-details">
+              <h4>Redes & Enlaces</h4>
+              <p>Cableado y Servidores</p>
+            </div>
+          </div>
+
+          <div class="cat-pill-card" data-cat="Ciberseguridad">
+            <div class="cat-icon-box box-seguridad">🔒</div>
+            <div class="cat-details">
+              <h4>Ciberseguridad</h4>
+              <p>Firewalls & Backups</p>
+            </div>
+          </div>
+
+          <div class="cat-pill-card" data-cat="Consultoría tecnológica">
+            <div class="cat-icon-box box-consultoria">💡</div>
+            <div class="cat-details">
+              <h4>Consultoría TI</h4>
+              <p>Nube & Soluciones</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- LISTADO DE TARJETAS DE SERVICIOS -->
+      <div class="listings-section">
+        <div class="listings-bar">
+          <div>
+            <h3 class="listings-title">Servicios Disponibles</h3>
+            <p class="listings-subtitle">Se encontraron <strong id="servicesCount" class="text-accent">0</strong> servicios autorizados</p>
+          </div>
+          <div class="listings-filter-pills">
+            <button class="pill-reset" id="btnResetFilters">↺ Limpiar Filtros</button>
+          </div>
+        </div>
+
+        <!-- Grilla de Tarjetas -->
+        <div id="servicesGrid" class="cards-grid">
+          <!-- Renderizado dinámicamente con estética premium -->
+        </div>
+
+        <!-- Estado Vacío -->
+        <div id="emptyServicesState" class="empty-glass-state" style="display: none;">
+          <div class="empty-graphic">✦ 📭 ✦</div>
+          <h3>Sin coincidencias exactas</h3>
+          <p>No encontramos servicios activos con los filtros indicados. Puedes probar cambiando la ciudad o restableciendo los filtros.</p>
+          <button class="btn-elegant-primary" onclick="resetCatalogFilters()">Ver todos los servicios</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- VISTA 2: DIRECTORIO DE EMPRESAS VERIFICADAS                         -->
+    <!-- --------------------------------------------------------------------- -->
+    <section id="tab-empresas-directorio" class="view-panel">
+      <div class="panel-hero-small">
+        <span class="hero-chip">DIRECTORIO DE CONFIANZA</span>
+        <h2>Empresas Proveedoras Verificadas</h2>
+        <p>Listado de partners tecnológicos certificados por Quantic Technology con presencia en diversas ciudades del Perú.</p>
+      </div>
+
+      <div id="empresasGrid" class="cards-grid empresas-grid">
+        <!-- Renderizado dinámicamente -->
+      </div>
+
+      <div id="emptyEmpresasState" class="empty-glass-state" style="display: none;">
+        <div class="empty-graphic">🏢</div>
+        <h3>No se encontraron empresas</h3>
+        <p>Aún no hay empresas aprobadas con esos criterios.</p>
+      </div>
+    </section>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- VISTA 3: FORMULARIO DE SOLICITUD DE REGISTRO DE EMPRESA              -->
+    <!-- --------------------------------------------------------------------- -->
+    <section id="tab-registro-empresa" class="view-panel">
+      <div class="elegant-form-card">
+        
+        <div class="form-header-badge">
+          <span class="sparkle">✦</span> INCORPORACIÓN DE PROVEEDORES
+        </div>
+        
+        <h2 class="form-title">Solicitud de Registro de Empresa</h2>
+        <p class="form-subtitle">
+          Complete los datos para postular su empresa al directorio comercial de Quantic Technology.
+        </p>
+
+        <div class="process-banner">
+          <div class="banner-icon-ring">⏳</div>
+          <div class="banner-text">
+            <strong>Flujo de Aprobación Obligatorio:</strong> Su solicitud se guardará en MySQL con estado inicial 
+            <span class="status-pill-badge pill-pending">PENDIENTE</span>. 
+            Aparecerá en el directorio público una vez sea aprobada por un administrador.
+          </div>
+        </div>
+
+        <form id="formRegistroEmpresa" class="stylish-form">
+          
+          <h3 class="form-group-heading">1. Identificación y Contacto de la Empresa</h3>
+
+          <div class="form-grid-2">
+            <div class="input-field">
+              <label for="empRazonSocial">Razón Social o Nombre Comercial <span class="required">*</span></label>
+              <div class="input-box">
+                <span class="input-icon">🏢</span>
+                <input type="text" id="empRazonSocial" required placeholder="Ej: TechSolutions Andina S.A.C.">
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="empRuc">RUC (11 dígitos - SUNAT Perú) <span class="required">*</span></label>
+              <div class="input-box">
+                <span class="input-icon">📋</span>
+                <input type="text" id="empRuc" required maxlength="11" pattern="\d{11}" placeholder="Ej: 20601234567 (Inicia con 10 o 20)">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid-3">
+            <div class="input-field">
+              <label for="empEmail">Correo de Contacto <span class="required">*</span></label>
+              <div class="input-box">
+                <span class="input-icon">✉️</span>
+                <input type="email" id="empEmail" required placeholder="contacto@empresa.pe">
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="empTelefono">WhatsApp / Celular Comercial <span class="required">*</span></label>
+              <div class="input-box">
+                <span class="input-icon">📞</span>
+                <input type="tel" id="empTelefono" required placeholder="+51 987 654 321">
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="empCiudad">Región / Ciudad Sede <span class="required">*</span></label>
+              <div class="input-box">
+                <span class="input-icon">📍</span>
+                <select id="empCiudad" required>
+                  <option value="Lima">Lima y Callao</option>
+                  <option value="Arequipa">Arequipa</option>
+                  <option value="Trujillo">Trujillo (La Libertad)</option>
+                  <option value="Chiclayo">Chiclayo (Lambayeque)</option>
+                  <option value="Piura">Piura</option>
+                  <option value="Cusco">Cusco</option>
+                  <option value="Huancayo">Huancayo (Junín)</option>
+                  <option value="Iquitos">Iquitos (Loreto)</option>
+                  <option value="Tacna">Tacna</option>
+                  <option value="Chimbote">Chimbote (Áncash)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="input-field">
+              <label for="empDireccion">Dirección Física</label>
+              <div class="input-box">
+                <span class="input-icon">📌</span>
+                <input type="text" id="empDireccion" placeholder="Av. Los Ingenieros 340, Oficina 501">
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="empSitioWeb">Sitio Web Oficial</label>
+              <div class="input-box">
+                <span class="input-icon">🌐</span>
+                <input type="url" id="empSitioWeb" placeholder="https://www.empresa.pe">
+              </div>
+            </div>
+          </div>
+
+          <div class="input-field">
+            <label for="empDescripcion">Reseña o Descripción de la Empresa</label>
+            <div class="input-box">
+              <textarea id="empDescripcion" rows="3" placeholder="Detalle la experiencia, certificaciones o enfoque de su empresa..."></textarea>
+            </div>
+          </div>
+
+          <h3 class="form-group-heading">2. Primer Servicio a Registrar (Opcional)</h3>
+
+          <div class="form-grid-2">
+            <div class="input-field">
+              <label for="srvNombreIni">Título del Servicio</label>
+              <div class="input-box">
+                <span class="input-icon">⚡</span>
+                <input type="text" id="srvNombreIni" placeholder="Ej: Diagnóstico y Mantenimiento de Servidores">
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="srvCategoriaIni">Categoría</label>
+              <div class="input-box">
+                <span class="input-icon">📂</span>
+                <select id="srvCategoriaIni">
+                  <option value="Soporte técnico">Soporte técnico</option>
+                  <option value="Redes e infraestructura">Redes e infraestructura</option>
+                  <option value="Ciberseguridad">Ciberseguridad</option>
+                  <option value="Consultoría tecnológica">Consultoría tecnológica</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="input-field">
+              <label for="srvTipoIni">Modalidad de Prestación</label>
+              <div class="input-box">
+                <span class="input-icon">💻</span>
+                <select id="srvTipoIni">
+                  <option value="Presencial">Presencial</option>
+                  <option value="Remoto">Remoto</option>
+                  <option value="Híbrido">Híbrido</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="srvPrecioIni">Precio Referencial</label>
+              <div class="input-box">
+                <span class="input-icon">💵</span>
+                <input type="text" id="srvPrecioIni" placeholder="Ej: Desde S/ 150 o A cotizar">
+              </div>
+            </div>
+          </div>
+
+          <div class="input-field">
+            <label for="srvDescIni">Detalle del Servicio</label>
+            <div class="input-box">
+              <textarea id="srvDescIni" rows="2" placeholder="Alcance, entregables y metodología del servicio..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-cta-row">
+            <button type="submit" class="btn-elegant-primary" id="btnEnviarEmpresa">
+              <span>Enviar Solicitud de Registro</span>
+              <span class="btn-arrow">→</span>
+            </button>
+            <button type="reset" class="btn-elegant-ghost">Restablecer Campos</button>
+          </div>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- VISTA 4: FORMULARIO DE REGISTRO DE SERVICIO ASOCIADO                  -->
+    <!-- --------------------------------------------------------------------- -->
+    <section id="tab-registro-servicio" class="view-panel">
+      <div class="elegant-form-card">
+        
+        <div class="form-header-badge">
+          <span class="sparkle">✦</span> CATÁLOGO DE SERVICIOS
+        </div>
+        
+        <h2 class="form-title">Añadir Nuevo Servicio Tecnológico</h2>
+        <p class="form-subtitle">
+          Incorpore una nueva oferta a una empresa proveedora ya registrada en el directorio.
+        </p>
+
+        <form id="formRegistroServicio" class="stylish-form">
+          
+          <div class="input-field">
+            <label for="srvEmpresaSelect">Empresa Proveedora Asociada <span class="required">*</span></label>
+            <div class="input-box">
+              <span class="input-icon">🏢</span>
+              <select id="srvEmpresaSelect" required>
+                <option value="">Cargando empresas registradas...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="input-field">
+              <label for="srvNombre">Nombre del Servicio <span class="required">*</span></label>
+              <div class="input-box">
+                <span class="input-icon">⚡</span>
+                <input type="text" id="srvNombre" required placeholder="Ej: Implementación de Cortafuegos UTM">
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="srvCategoria">Categoría <span class="required">*</span></label>
+              <div class="input-box">
+                <span class="input-icon">📂</span>
+                <select id="srvCategoria" required>
+                  <option value="Soporte técnico">Soporte técnico</option>
+                  <option value="Redes e infraestructura">Redes e infraestructura</option>
+                  <option value="Ciberseguridad">Ciberseguridad</option>
+                  <option value="Consultoría tecnológica">Consultoría tecnológica</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="input-field">
+              <label for="srvTipo">Modalidad de Atención</label>
+              <div class="input-box">
+                <span class="input-icon">💻</span>
+                <select id="srvTipo">
+                  <option value="Presencial">Presencial</option>
+                  <option value="Remoto">Remoto</option>
+                  <option value="Híbrido">Híbrido</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="srvPrecio">Precio Referencial</label>
+              <div class="input-box">
+                <span class="input-icon">💵</span>
+                <input type="text" id="srvPrecio" placeholder="Ej: Desde S/ 250 / A cotizar">
+              </div>
+            </div>
+          </div>
+
+          <div class="input-field">
+            <label for="srvDescripcion">Descripción Detallada <span class="required">*</span></label>
+            <div class="input-box">
+              <textarea id="srvDescripcion" rows="4" required placeholder="Describa el alcance, entregables y requisitos técnicos del servicio..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-cta-row">
+            <button type="submit" class="btn-elegant-primary" id="btnEnviarServicio">
+              <span>Guardar Servicio</span>
+              <span class="btn-arrow">→</span>
+            </button>
+            <button type="reset" class="btn-elegant-ghost">Limpiar</button>
+          </div>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- VISTA 5: PANEL DE DEMOSTRACIÓN ADMINISTRATIVA                         -->
+    <!-- --------------------------------------------------------------------- -->
+    <section id="tab-panel-admin-demo" class="view-panel">
+      
+      <!-- Aviso de Demostración Local Requerido -->
+      <div class="admin-warning-card">
+        <div class="warning-ring">🛡️</div>
+        <div class="warning-text">
+          <h4>CONSOLA DE CONTROL Y ADMINISTRACIÓN OPERATIVA</h4>
+          <p>
+            Esta consola permite evaluar, aprobar o inhabilitar solicitudes de proveedores y sus servicios tecnológicos 
+            para el control del directorio comercial de Quantic Technology.
+          </p>
+        </div>
+      </div>
+
+      <div class="admin-top-bar">
+        <div>
+          <h2 class="subheading-title">Gestión y Control de Proveedores</h2>
+          <p class="subheading-note">Habilite, inhabilite o revise empresas y servicios tecnológicos.</p>
+        </div>
+
+        <div class="admin-filter-pill-group">
+          <button class="admin-pill-btn active" data-estado="">Todas</button>
+          <button class="admin-pill-btn" data-estado="PENDIENTE">⏳ Pendientes</button>
+          <button class="admin-pill-btn" data-estado="APROBADO">✓ Aprobadas</button>
+          <button class="admin-pill-btn" data-estado="INACTIVO">⏸ Inhabilitadas</button>
+          <button class="admin-pill-btn" data-estado="RECHAZADO">✗ Rechazadas</button>
+        </div>
+      </div>
+
+      <div id="solicitudesContainer" class="solicitudes-flow">
+        <!-- Renderizado dinámicamente -->
+      </div>
+
+    </section>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- VISTA: PORTAL DE PROVEEDORES (AUTOGESTIÓN PARA EMPRESAS)              -->
+    <!-- --------------------------------------------------------------------- -->
+    <section id="tab-portal-empresa" class="view-panel">
+      
+      <!-- Pantalla 1: Identificación con RUC de la Empresa -->
+      <div id="portalEmpresaLogin" class="elegant-form-card" style="margin-bottom: 2rem;">
+        <div class="form-header-badge">
+          <span class="sparkle">✦</span> AUTOGESTIÓN DE PROVEEDORES TI
+        </div>
+        <h2 class="form-title">Portal de Empresas Proveedoras</h2>
+        <p class="form-subtitle">
+          Bienvenido. Identifíquese con su número de RUC para gestionar sus servicios, modificar precios referenciales, actualizar modalidades y datos de contacto de su empresa.
+        </p>
+
+        <div class="process-banner" style="background: #eff6ff; border-color: #bfdbfe;">
+          <div class="banner-icon-ring" style="background: #dbeafe; color: #1d4ed8;">🔑</div>
+          <div class="banner-text" style="color: #1e40af;">
+            <strong>Integración Futura con Microservicio S1:</strong> Este acceso permite la autogestión directa de su empresa. En la fase integrada, la autenticación y permisos se validarán de forma centralizada mediante credenciales o tokens del <em>Servicio de Control de Accesos y Auditoría</em>.
+          </div>
+        </div>
+
+        <form id="formAccesoPortal" style="display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: flex-end; max-width: 650px;">
+          <div class="input-field">
+            <label for="portalRucInput">Número de RUC Oficial (11 dígitos) <span class="required">*</span></label>
+            <div class="input-box">
+              <span class="input-icon">📋</span>
+              <input type="text" id="portalRucInput" maxlength="11" pattern="\d{11}" required placeholder="Ej: 20601234561 (TechFix)">
+            </div>
+          </div>
+          <button type="submit" class="btn-elegant-primary" style="height: 48px;">
+            Ingresar a mi Portal →
+          </button>
+        </form>
+
+        <!-- Acceso rápido de demostración -->
+        <div style="margin-top: 1.6rem; padding-top: 1.2rem; border-top: 1px solid var(--silver-border);">
+          <span style="font-size: 0.84rem; color: var(--navy-muted); font-weight: 700;">Acceso rápido para probar como empresa registrada:</span>
+          <div id="quickPortalSelectChips" style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.6rem;">
+            <!-- Renderizado dinámicamente -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Pantalla 2: Dashboard Privado de la Empresa (se activa al ingresar) -->
+      <div id="portalEmpresaDashboard" style="display: none;">
+        
+        <!-- Ficha Resumen de la Empresa -->
+        <div class="portal-header-card">
+          <div class="portal-company-info">
+            <div style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+              <h2 id="portalNombreEmpresa" class="hero-heading" style="font-size: 2rem; margin: 0;">Razón Social</h2>
+              <span id="portalBadgeEstado" class="status-pill-badge" style="background: #dcfce7; color: #166534;">HABILITADO ✓</span>
+            </div>
+            
+            <div class="portal-meta-strip">
+              <span>📋 RUC: <strong id="portalRucText">-</strong></span>
+              <span>📍 Región/Ciudad: <strong id="portalCiudadText">-</strong></span>
+              <span>📞 Teléfono/WhatsApp: <strong id="portalTelefonoText">-</strong></span>
+              <span>✉️ Correo: <strong id="portalEmailText">-</strong></span>
+            </div>
+
+            <div style="margin-top: 0.8rem; font-size: 0.9rem; color: var(--navy-body);">
+              <strong>Dirección:</strong> <span id="portalDireccionText">-</span> &bull; 
+              <strong>Sitio Web:</strong> <span id="portalWebText">-</span>
+            </div>
+            
+            <p id="portalDescText" style="margin-top: 0.6rem; font-size: 0.92rem; color: var(--navy-muted); line-height: 1.5;">-</p>
+          </div>
+
+          <div class="portal-header-actions">
+            <button class="btn-card-primary" id="btnEditarMiEmpresa" style="background: var(--cobalt-gradient); justify-content: center;">
+              ✏️ Editar Datos de Empresa
+            </button>
+            <button class="btn-card-ghost" id="btnCerrarSesionPortal" style="justify-content: center;">
+              🚪 Salir / Cambiar Empresa
+            </button>
+          </div>
+        </div>
+
+        <!-- Sección: Mis Servicios Tecnológicos -->
+        <div style="margin-top: 2.2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.8rem;">
+            <div>
+              <h3 class="subheading-title">Mis Servicios Publicados</h3>
+              <p class="subheading-note">Actualice precios referenciales en Soles, modalidad de atención o pause ofertas.</p>
+            </div>
+            <button class="btn-elegant-primary" id="btnNuevoServicioDesdePortal">
+              ➕ Publicar Nuevo Servicio
+            </button>
+          </div>
+
+          <div id="portalServiciosGrid" class="cards-grid">
+            <!-- Renderizado dinámicamente -->
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: EDITAR DATOS COMERCIALES DE EMPRESA                                -->
+  <!-- ========================================================================= -->
+  <div id="modalEditarEmpresa" class="modal-backdrop" style="display: none;">
+    <div class="modal-glass-sheet">
+      <div class="modal-top">
+        <div class="modal-heading-group">
+          <span class="hero-chip">AUTOGESTIÓN EMPRESARIAL</span>
+          <h3 id="modalEditEmpresaTitulo">Editar Datos Comerciales</h3>
+        </div>
+        <button class="modal-close-round" onclick="cerrarModalEditarEmpresa()">&times;</button>
+      </div>
+
+      <form id="formModalEditarEmpresa" class="modal-scroll-area stylish-form">
+        <input type="hidden" id="editEmpresaId">
+        
+        <div class="input-field">
+          <label for="editEmpTelefono">WhatsApp / Teléfono Comercial <span class="required">*</span></label>
+          <div class="input-box">
+            <span class="input-icon">📞</span>
+            <input type="tel" id="editEmpTelefono" required placeholder="+51 987 654 321">
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="editEmpCiudad">Región / Ciudad Sede <span class="required">*</span></label>
+          <div class="input-box">
+            <span class="input-icon">📍</span>
+            <select id="editEmpCiudad" required>
+              <option value="Lima">Lima y Callao</option>
+              <option value="Arequipa">Arequipa</option>
+              <option value="Trujillo">Trujillo (La Libertad)</option>
+              <option value="Chiclayo">Chiclayo (Lambayeque)</option>
+              <option value="Piura">Piura</option>
+              <option value="Cusco">Cusco</option>
+              <option value="Huancayo">Huancayo (Junín)</option>
+              <option value="Iquitos">Iquitos (Loreto)</option>
+              <option value="Tacna">Tacna</option>
+              <option value="Chimbote">Chimbote (Áncash)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="editEmpDireccion">Dirección Física</label>
+          <div class="input-box">
+            <span class="input-icon">📌</span>
+            <input type="text" id="editEmpDireccion" placeholder="Av. Principal 123, Of. 401">
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="editEmpSitioWeb">Sitio Web Oficial</label>
+          <div class="input-box">
+            <span class="input-icon">🌐</span>
+            <input type="url" id="editEmpSitioWeb" placeholder="https://www.miempresa.pe">
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="editEmpDescripcion">Reseña o Descripción</label>
+          <div class="input-box">
+            <textarea id="editEmpDescripcion" rows="3" placeholder="Descripción de la empresa..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-bottom" style="padding: 1rem 0 0 0;">
+          <button type="button" class="btn-elegant-ghost" onclick="cerrarModalEditarEmpresa()">Cancelar</button>
+          <button type="submit" class="btn-elegant-primary">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: EDITAR SERVICIO (PRECIO, MODALIDAD, ALCANCE)                       -->
+  <!-- ========================================================================= -->
+  <div id="modalEditarServicio" class="modal-backdrop" style="display: none;">
+    <div class="modal-glass-sheet">
+      <div class="modal-top">
+        <div class="modal-heading-group">
+          <span class="hero-chip">ACTUALIZACIÓN DE SERVICIO</span>
+          <h3 id="modalEditServicioTitulo">Editar Oferta Tecnológica</h3>
+        </div>
+        <button class="modal-close-round" onclick="cerrarModalEditarServicio()">&times;</button>
+      </div>
+
+      <form id="formModalEditarServicio" class="modal-scroll-area stylish-form">
+        <input type="hidden" id="editServicioId">
+
+        <div class="input-field">
+          <label for="editSrvNombre">Título del Servicio <span class="required">*</span></label>
+          <div class="input-box">
+            <span class="input-icon">⚡</span>
+            <input type="text" id="editSrvNombre" required placeholder="Nombre del servicio">
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="input-field">
+            <label for="editSrvCategoria">Categoría <span class="required">*</span></label>
+            <div class="input-box">
+              <span class="input-icon">📂</span>
+              <select id="editSrvCategoria" required>
+                <option value="Soporte técnico">Soporte técnico</option>
+                <option value="Redes e infraestructura">Redes e infraestructura</option>
+                <option value="Ciberseguridad">Ciberseguridad</option>
+                <option value="Consultoría tecnológica">Consultoría tecnológica</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-field">
+            <label for="editSrvTipo">Modalidad de Atención <span class="required">*</span></label>
+            <div class="input-box">
+              <span class="input-icon">💻</span>
+              <select id="editSrvTipo" required>
+                <option value="Presencial">Presencial</option>
+                <option value="Remoto">Remoto</option>
+                <option value="Híbrido">Híbrido</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="editSrvPrecio">Precio Referencial (S/ PEN) <span class="required">*</span></label>
+          <div class="input-box">
+            <span class="input-icon">💵</span>
+            <input type="text" id="editSrvPrecio" required placeholder="Ej: Desde S/ 150 + IGV o A cotizar">
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="editSrvDescripcion">Descripción Detallada y Alcance <span class="required">*</span></label>
+          <div class="input-box">
+            <textarea id="editSrvDescripcion" rows="4" required placeholder="Detalle el alcance y entregables del servicio..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-bottom" style="padding: 1rem 0 0 0;">
+          <button type="button" class="btn-elegant-ghost" onclick="cerrarModalEditarServicio()">Cancelar</button>
+          <button type="submit" class="btn-elegant-primary">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL DE DETALLE DE EMPRESA                                               -->
+  <!-- ========================================================================= -->
+  <div id="empresaModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-glass-sheet">
+      <div class="modal-top">
+        <div class="modal-heading-group">
+          <span class="hero-chip">FICHA DE PROVEEDOR</span>
+          <h3 id="modalEmpresaNombre">Nombre de la Empresa</h3>
+        </div>
+        <button class="modal-close-round" onclick="cerrarModal()">&times;</button>
+      </div>
+
+      <div class="modal-scroll-area" id="modalEmpresaBody">
+        <!-- Contenido inyectado dinámicamente -->
+      </div>
+
+      <div class="modal-bottom">
+        <button class="btn-elegant-ghost" onclick="cerrarModal()">Cerrar Ficha</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENEDOR TOAST NOTIFICACIONES -->
+  <div id="toastContainer" class="toast-stack"></div>
+
+  <!-- PIE DE PÁGINA ELEGANTE -->
+  <footer class="footer-modern">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <strong>Quantic Technology S.A.C.</strong> &bull; Directorio Comercial de Servicios Tecnológicos
+        <p>Plataforma de consulta empresarial de proveedores y servicios en el Perú &bull; Arquitectura REST</p>
+      </div>
+      <div class="footer-right">
+        <span>Diseño Profesional &bull; Interfaz Dinámica</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

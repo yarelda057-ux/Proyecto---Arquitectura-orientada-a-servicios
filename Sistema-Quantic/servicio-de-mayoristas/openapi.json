@@ -1,0 +1,783 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Servicio de Gestión de Stock de Mayoristas",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/auth/login": {
+      "post": {
+        "summary": "Obtiene token Bearer",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/auth/profile": {
+      "get": {
+        "summary": "Identidad de la sesión",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "summary": "Revoca sesión",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        }
+      }
+    },
+    "/api/v1/stock/proveedores": {
+      "get": {
+        "summary": "Lista proveedores visibles",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        }
+      },
+      "post": {
+        "summary": "Administrador: registra proveedor",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre": {
+                    "type": "string"
+                  },
+                  "correoContacto": {
+                    "type": "string"
+                  },
+                  "ruc": {
+                    "type": "string"
+                  },
+                  "periodoActualizacionDias": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "nombre",
+                  "correoContacto"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stock/proveedores/{idMayorista}": {
+      "put": {
+        "summary": "Administrador: modifica proveedor",
+        "parameters": [
+          {
+            "name": "idMayorista",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre": {
+                    "type": "string"
+                  },
+                  "correoContacto": {
+                    "type": "string"
+                  },
+                  "ruc": {
+                    "type": "string"
+                  },
+                  "periodoActualizacionDias": {
+                    "type": "integer"
+                  },
+                  "activo": {
+                    "type": "boolean"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stock/proveedores/{idMayorista}/usuarios": {
+      "post": {
+        "summary": "Administrador: crea acceso",
+        "parameters": [
+          {
+            "name": "idMayorista",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stock/proveedores/{idMayorista}/usuarios/{idUsuario}/password": {
+      "put": {
+        "summary": "Administrador: cambia contraseña y revoca sesiones",
+        "parameters": [
+          {
+            "name": "idMayorista",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "idUsuario",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "password"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stock/upload": {
+      "post": {
+        "summary": "Valida XLSX",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idMayorista": {
+                    "type": "string"
+                  },
+                  "formato": {
+                    "type": "string"
+                  },
+                  "archivoBase64": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "idMayorista",
+                  "formato",
+                  "archivoBase64"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stock/upload/{idLote}/validate": {
+      "get": {
+        "summary": "Informe de validación",
+        "parameters": [
+          {
+            "name": "idLote",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        }
+      }
+    },
+    "/api/v1/stock/lotes/{idLote}": {
+      "get": {
+        "summary": "Estado de lote",
+        "parameters": [
+          {
+            "name": "idLote",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        }
+      }
+    },
+    "/api/v1/stock/lotes/{idLote}/confirmacion": {
+      "post": {
+        "summary": "Publica productos del lote",
+        "parameters": [
+          {
+            "name": "idLote",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idOperacion": {
+                    "type": "string"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stock/products": {
+      "get": {
+        "summary": "Productos paginados",
+        "parameters": [
+          {
+            "name": "idMayorista",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "codigo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nombre",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoria",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        }
+      }
+    },
+    "/api/v1/stock/categories": {
+      "get": {
+        "summary": "Categorías",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        }
+      }
+    },
+    "/api/v1/stock/products/{idProducto}": {
+      "put": {
+        "summary": "Ajusta existencias con control de versión",
+        "parameters": [
+          {
+            "name": "idProducto",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idMayorista": {
+                    "type": "string"
+                  },
+                  "stockNuevo": {
+                    "type": "integer"
+                  },
+                  "motivo": {
+                    "type": "string"
+                  },
+                  "versionEsperada": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "idMayorista",
+                  "stockNuevo",
+                  "motivo",
+                  "versionEsperada"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

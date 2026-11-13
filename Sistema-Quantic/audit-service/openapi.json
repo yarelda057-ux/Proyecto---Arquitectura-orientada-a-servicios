@@ -1,0 +1,527 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Servicio de Control de Accesos y Auditoría",
+    "description": "Registros inmutables por API. Cada credencial está limitada a un sistema y a permisos de lectura/escritura.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/health/live": {
+      "get": {
+        "tags": [
+          "Salud"
+        ],
+        "summary": "Live",
+        "operationId": "live_health_live_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": [
+          "Salud"
+        ],
+        "summary": "Ready",
+        "operationId": "ready_health_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/events": {
+      "post": {
+        "tags": [
+          "Auditoría"
+        ],
+        "summary": "Record",
+        "operationId": "record_v1_events_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Auditoría"
+        ],
+        "summary": "Search",
+        "operationId": "search_v1_events_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 24
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "actor_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Actor Id"
+            }
+          },
+          {
+            "name": "method",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "GET",
+                    "POST",
+                    "PUT",
+                    "PATCH",
+                    "DELETE",
+                    "HEAD",
+                    "OPTIONS"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Method"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 1024
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Path"
+            }
+          },
+          {
+            "name": "status_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 599,
+                  "minimum": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status Code"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Until"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EventIn": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Event Id"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          },
+          "actor_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Id"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE",
+              "HEAD",
+              "OPTIONS"
+            ],
+            "title": "Method"
+          },
+          "path": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1,
+            "pattern": "^/[^?#\\x00-\\x1f\\x7f]*$",
+            "title": "Path"
+          },
+          "status_code": {
+            "type": "integer",
+            "maximum": 599.0,
+            "minimum": 100.0,
+            "title": "Status Code"
+          },
+          "duration_ms": {
+            "type": "integer",
+            "maximum": 86400000.0,
+            "minimum": 0.0,
+            "title": "Duration Ms"
+          },
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "event_id",
+          "occurred_at",
+          "method",
+          "path",
+          "status_code",
+          "duration_ms",
+          "request_id"
+        ],
+        "title": "EventIn"
+      },
+      "EventOut": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Event Id"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          },
+          "actor_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128,
+                "pattern": "^[^\\x00-\\x1f\\x7f]+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Id"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE",
+              "HEAD",
+              "OPTIONS"
+            ],
+            "title": "Method"
+          },
+          "path": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1,
+            "pattern": "^/[^?#\\x00-\\x1f\\x7f]*$",
+            "title": "Path"
+          },
+          "status_code": {
+            "type": "integer",
+            "maximum": 599.0,
+            "minimum": 100.0,
+            "title": "Status Code"
+          },
+          "duration_ms": {
+            "type": "integer",
+            "maximum": 86400000.0,
+            "minimum": 0.0,
+            "title": "Duration Ms"
+          },
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "received_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Received At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "event_id",
+          "occurred_at",
+          "method",
+          "path",
+          "status_code",
+          "duration_ms",
+          "request_id",
+          "id",
+          "source",
+          "received_at"
+        ],
+        "title": "EventOut"
+      },
+      "EventPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EventOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "EventPage"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

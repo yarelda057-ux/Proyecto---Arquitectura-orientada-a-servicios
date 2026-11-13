@@ -1,0 +1,34 @@
+# Dependencias y compilaciones
+**/node_modules/
+**/dist/
+**/build/
+# Secretos y configuración local
+**/.env
+**/.env.*
+!**/.env.example
+**/clients.local.json
+*.pem
+*.key
+*.pfx
+# Entornos y cachés
+**/.venv*/
+**/venv/
+**/__pycache__/
+**/.pytest_cache/
+**/pytest-cache-files-*/
+**/*.pyc
+**/.cache/
+# Archivos locales y datos
+**/tmp/
+**/uploads/
+**/logs/
+*.log
+*.tmp
+*.tmp.txt
+*.sqlite
+*.sqlite3
+*.db
+*.zip
+.DS_Store
+Thumbs.db
+**/.idea/
