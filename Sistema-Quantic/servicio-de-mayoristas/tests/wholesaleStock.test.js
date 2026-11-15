@@ -22,7 +22,8 @@ test('la plantilla de mayoristas admite las columnas de la propuesta e ignora su
   assert.equal(result.filasCorrectas, 2);
   assert.deepEqual(result.errores, []);
   assert.equal(result.filas[1].precioUsd, 1142.86);
-  assert.equal(result.filas[0].categoria, 'Sin categoría');
+  assert.equal(result.filas[0].categoria, 'Seguridad de red');
+  assert.equal(result.filas[0].categoriaOrigen, 'SECCION');
 });
 
 test('la plantilla rechaza columnas obligatorias ausentes y fórmulas', async () => {

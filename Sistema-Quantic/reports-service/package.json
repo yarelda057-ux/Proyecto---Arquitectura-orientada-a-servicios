@@ -1,0 +1,8 @@
+{
+  "name": "servicio-reportes-dashboards-inventario",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.13.0" },
+  "scripts": { "start": "node --env-file=.env src/index.js", "test": "node --test tests/*.test.js" }
+}

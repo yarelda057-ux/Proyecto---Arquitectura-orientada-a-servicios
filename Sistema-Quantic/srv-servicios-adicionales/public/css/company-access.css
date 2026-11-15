@@ -1,0 +1,11 @@
+[hidden] { display: none !important; }
+.company-session-notice { padding: 1rem; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 12px; margin-bottom: 1.5rem; }
+.company-management { border: 1px solid #cbd5e1; border-radius: 16px; padding: 1.5rem; margin: 1rem 0 2rem; background: white; }
+.company-management label, .company-activities label { display: block; margin: .7rem 0; }
+.company-management input:not([type=checkbox]), .company-management select { display: block; width: 100%; padding: .75rem; border: 1px solid #cbd5e1; border-radius: 8px; }
+.company-activities { padding: 1rem; margin: 1rem 0; border: 1px solid #cbd5e1; border-radius: 10px; }
+.company-activities legend { font-weight: 700; }
+.company-activities input[type=checkbox] { width: auto; margin-right: .5rem; }
+.company-buttons { display: flex; flex-wrap: wrap; gap: .75rem; }
+#companyAccessForm { margin-top: 1.5rem; }
+#companyAccessForm button { margin-top: 1rem; }

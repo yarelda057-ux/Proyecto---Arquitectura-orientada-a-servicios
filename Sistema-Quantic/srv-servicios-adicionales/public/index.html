@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/company-access.css">
 </head>
 <body>
 
@@ -54,7 +55,7 @@
           <span class="btn-icon">💼</span> Portal Empresa
         </button>
         <button class="nav-btn nav-btn-admin" data-tab="panel-admin-demo">
-          <span class="btn-icon">🛡️</span> Panel Admin <span class="admin-pill">DEMO</span>
+          <span class="btn-icon">🛡️</span> Gestion de empresas <span class="admin-pill">ADMIN</span>
         </button>
       </nav>
 
@@ -642,13 +643,13 @@
         </div>
         <h2 class="form-title">Portal de Empresas Proveedoras</h2>
         <p class="form-subtitle">
-          Bienvenido. Identifíquese con su número de RUC para gestionar sus servicios, modificar precios referenciales, actualizar modalidades y datos de contacto de su empresa.
+          Accede desde tu cuenta del inventario. Cada empresa puede gestionar sus propios datos y las actividades autorizadas.
         </p>
 
         <div class="process-banner" style="background: #eff6ff; border-color: #bfdbfe;">
           <div class="banner-icon-ring" style="background: #dbeafe; color: #1d4ed8;">🔑</div>
           <div class="banner-text" style="color: #1e40af;">
-            <strong>Integración Futura con Microservicio S1:</strong> Este acceso permite la autogestión directa de su empresa. En la fase integrada, la autenticación y permisos se validarán de forma centralizada mediante credenciales o tokens del <em>Servicio de Control de Accesos y Auditoría</em>.
+            <strong>Acceso con cuenta:</strong> La sesion del inventario identifica a tu empresa y verifica sus permisos. Conocer un RUC no concede acceso.
           </div>
         </div>
 
@@ -667,7 +668,7 @@
 
         <!-- Acceso rápido de demostración -->
         <div style="margin-top: 1.6rem; padding-top: 1.2rem; border-top: 1px solid var(--silver-border);">
-          <span style="font-size: 0.84rem; color: var(--navy-muted); font-weight: 700;">Acceso rápido para probar como empresa registrada:</span>
+          <span style="font-size: 0.84rem; color: var(--navy-muted); font-weight: 700;">Consulta administrativa de empresas:</span>
           <div id="quickPortalSelectChips" style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.6rem;">
             <!-- Renderizado dinámicamente -->
           </div>
@@ -920,6 +921,8 @@
     </div>
   </footer>
 
+  <script src="js/company-config.js"></script>
+  <script src="js/company-access.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

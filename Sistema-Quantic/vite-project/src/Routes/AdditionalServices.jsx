@@ -1,74 +1,111 @@
-import { useEffect, useState } from 'react';
-import Modal from 'react-bootstrap/Modal';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { SfpContext } from '../context/authContext';
 import { api } from '../services/http';
+import './AdditionalServices.css';
 
-const blank = { q: '', categoria: '', ciudad: '', tipo_servicio: '' };
-const categories = ['Soporte técnico', 'Redes e infraestructura', 'Ciberseguridad', 'Consultoría tecnológica'];
-function website(value) {
-  try { const url = new URL(value); return ['http:', 'https:'].includes(url.protocol) ? url.href : null; } catch { return null; }
+function portalAddress() {
+  const configured = import.meta.env.VITE_ADDITIONAL_SERVICES_URL?.trim();
+  try {
+    const url = configured ? new URL(configured) : new URL(window.location.origin);
+    if (!configured) { url.port = '3002'; url.pathname = '/'; }
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) return null;
+    url.search = ''; url.hash = '';
+    if (!url.pathname.endsWith('/')) url.pathname += '/';
+    return url.href;
+  } catch { return null; }
 }
-function Contact({ company }) {
-  const url = website(company?.sitio_web);
-  return <dl className="row mb-0"><dt className="col-sm-4">Empresa</dt><dd className="col-sm-8">{company?.razon_social || '—'}</dd><dt className="col-sm-4">RUC</dt><dd className="col-sm-8">{company?.ruc || '—'}</dd><dt className="col-sm-4">Ciudad</dt><dd className="col-sm-8">{company?.ciudad || '—'}</dd><dt className="col-sm-4">Dirección</dt><dd className="col-sm-8">{company?.direccion || '—'}</dd><dt className="col-sm-4">Teléfono</dt><dd className="col-sm-8">{company?.telefono || '—'}</dd><dt className="col-sm-4">Correo</dt><dd className="col-sm-8 text-break">{company?.email_contacto || '—'}</dd>{url && <><dt className="col-sm-4">Sitio web</dt><dd className="col-sm-8 text-break"><a href={url} target="_blank" rel="noopener noreferrer">Visitar sitio web</a></dd></>}</dl>;
-}
+
+// The provider owns its HTML, styles, scripts and API. Do not copy its UI into React.
+const portalUrl = portalAddress();
+
 export default function AdditionalServices() {
-  const [kind, setKind] = useState('servicios');
-  const [filters, setFilters] = useState(blank);
-  const [search, setSearch] = useState('');
-  const [reload, setReload] = useState(0);
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [selected, setSelected] = useState(null);
-  const [detail, setDetail] = useState(null);
-  const [detailError, setDetailError] = useState('');
-  const [detailLoading, setDetailLoading] = useState(false);
+  const frame = useRef(null);
+  const navigate = useNavigate();
+  const { user } = useContext(SfpContext);
+  const [attempt, setAttempt] = useState(0);
+  const [status, setStatus] = useState('loading');
+  const [persistent, setPersistent] = useState(true);
+  const [sessionError, setSessionError] = useState('');
+
   useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true); setError(''); setItems([]);
-    api('/additional-services/' + kind + search, { signal: controller.signal })
-      .then(data => setItems(data.datos))
-      .catch(err => { if (!controller.signal.aborted) setError(err.message); })
-      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
-    return () => controller.abort();
-  }, [kind, search, reload]);
+    if (status !== 'ready' || !portalUrl) return;
+    const origin = new URL(portalUrl).origin;
+    let active = true, busy = false;
+    async function sendSession() {
+      if (busy) return;
+      busy = true;
+      try {
+        const { token } = await api('/additional-services/portal-session', { method: 'POST' });
+        if (active) { frame.current?.contentWindow?.postMessage({ type: 'quantic-company-session', token }, origin); setSessionError(''); }
+      } catch (err) { if (active) setSessionError(err.message); }
+      finally { busy = false; }
+    }
+    function receive(event) {
+      if (event.origin !== origin || event.source !== frame.current?.contentWindow) return;
+      if (event.data?.type === 'quantic-company-ready') void sendSession();
+      if (event.data?.type === 'quantic-company-stock' && user?.canUploadStock) navigate('/SupplierUpload');
+    }
+    window.addEventListener('message', receive);
+    void sendSession();
+    const timer = setInterval(sendSession, 30000);
+    return () => { active = false; clearInterval(timer); window.removeEventListener('message', receive); };
+  }, [status, attempt, navigate, user?.canUploadStock]);
+
   useEffect(() => {
-    if (!selected) return;
+    if (!portalUrl) return;
     const controller = new AbortController();
-    setDetail(null); setDetailError(''); setDetailLoading(true);
-    api('/additional-services/' + selected.kind + '/' + selected.id, { signal: controller.signal })
-      .then(data => setDetail(data.datos))
-      .catch(err => { if (!controller.signal.aborted) setDetailError(err.message); })
-      .finally(() => { if (!controller.signal.aborted) setDetailLoading(false); });
-    return () => controller.abort();
-  }, [selected]);
-  function submit(event) {
-    event.preventDefault();
-    const query = new URLSearchParams();
-    for (const [key, value] of Object.entries(filters)) if (value.trim() && (kind === 'servicios' || ['q', 'ciudad'].includes(key))) query.set(key, value.trim());
-    setSearch(query.size ? '?' + query : ''); setReload(value => value + 1);
-  }
-  function changeKind(next) { setKind(next); setFilters(blank); setSearch(''); setSelected(null); }
-  return <main className="workspace">
-    <div className="page-heading"><div><span className="eyebrow">DIRECTORIO COMERCIAL</span><h1>Servicios adicionales</h1><p className="text-secondary">Encuentra empresas de soporte, redes, ciberseguridad y consultoría tecnológica.</p></div><button className="btn btn-outline-secondary" disabled={loading} onClick={() => setReload(value => value + 1)}>Actualizar</button></div>
-    <section className="panel mb-4">
-      <div className="btn-group mb-4" role="group" aria-label="Tipo de consulta">{['servicios', 'empresas'].map(value => <button key={value} className={'btn ' + (kind === value ? 'btn-primary' : 'btn-outline-primary')} aria-pressed={kind === value} onClick={() => changeKind(value)}>{value === 'servicios' ? 'Servicios' : 'Empresas'}</button>)}</div>
-      <form onSubmit={submit} className="row g-3 align-items-end">
-        <div className="col-md-6"><label htmlFor="additional-q" className="form-label">Buscar</label><input id="additional-q" className="form-control" maxLength={160} placeholder="Nombre, empresa o descripción" value={filters.q} onChange={e => setFilters({ ...filters, q: e.target.value })} /></div>
-        <div className="col-md-6"><label htmlFor="additional-city" className="form-label">Ciudad</label><input id="additional-city" className="form-control" maxLength={80} placeholder="Por ejemplo, Lima" value={filters.ciudad} onChange={e => setFilters({ ...filters, ciudad: e.target.value })} /></div>
-        {kind === 'servicios' && <><div className="col-md-6"><label htmlFor="additional-category" className="form-label">Categoría</label><select id="additional-category" className="form-select" value={filters.categoria} onChange={e => setFilters({ ...filters, categoria: e.target.value })}><option value="">Todas las categorías</option>{categories.map(value => <option key={value}>{value}</option>)}</select></div><div className="col-md-6"><label htmlFor="additional-mode" className="form-label">Modalidad</label><select id="additional-mode" className="form-select" value={filters.tipo_servicio} onChange={e => setFilters({ ...filters, tipo_servicio: e.target.value })}><option value="">Todas las modalidades</option>{['Presencial', 'Remoto', 'Híbrido'].map(value => <option key={value}>{value}</option>)}</select></div></>}
-        <div className="col-12 d-flex gap-2"><button className="btn btn-primary" disabled={loading}>Buscar</button><button type="button" className="btn btn-outline-secondary" onClick={() => { setFilters(blank); setSearch(''); setReload(value => value + 1); }}>Limpiar filtros</button></div>
-      </form>
-    </section>
-    {loading ? <div className="empty-state" role="status">Consultando el catálogo…</div> : error ? <div className="alert alert-warning" role="alert"><p>{error}</p><button className="btn btn-outline-dark btn-sm" onClick={() => setReload(value => value + 1)}>Reintentar</button></div> : <>
-      <p role="status" className="text-secondary">{items.length} {kind === 'servicios' ? 'servicios encontrados' : 'empresas encontradas'}</p>
-      {!items.length ? <div className="empty-state">No hay resultados publicados para estos filtros.</div> : <div className="row g-3">{items.map(item => <div className="col-md-6 col-xl-4" key={item.id}><article className="panel h-100 d-flex flex-column"><span className="eyebrow">{kind === 'servicios' ? item.categoria : item.ciudad}</span><h2 className="mt-2">{item.nombre || item.razon_social}</h2>{kind === 'servicios' && <p className="text-secondary">{item.empresa_razon_social} · {item.empresa_ciudad}</p>}<p>{item.descripcion}</p>{kind === 'servicios' && <p><strong>{item.precio_referencial || 'A cotizar'}</strong><br /><small>{item.tipo_servicio}</small></p>}<button className="btn btn-outline-primary mt-auto align-self-start" onClick={() => setSelected({ kind, id: item.id })}>Ver detalles y contacto</button></article></div>)}</div>}
-    </>}
-    <p className="text-secondary small mt-4">Los precios son referenciales. Contacta directamente a la empresa para consultar disponibilidad y condiciones.</p>
-    <Modal show={Boolean(selected)} onHide={() => setSelected(null)} size="lg" centered aria-labelledby="additional-detail-title">
-      <Modal.Header closeButton><Modal.Title id="additional-detail-title">{detail?.nombre || detail?.razon_social || 'Detalles del catálogo'}</Modal.Title></Modal.Header>
-      <Modal.Body>{detailLoading ? <p role="status">Cargando detalles…</p> : detailError ? <div role="alert"><p>{detailError}</p><button className="btn btn-outline-primary" onClick={() => setSelected({ ...selected })}>Reintentar</button></div> : detail && <><p>{detail.descripcion}</p>{selected?.kind === 'servicios' && <p><strong>{detail.precio_referencial || 'A cotizar'}</strong> · {detail.tipo_servicio}</p>}<Contact company={selected?.kind === 'servicios' ? detail.empresa : detail} />{selected?.kind === 'empresas' && <><h3 className="h5 mt-4">Servicios publicados</h3>{detail.servicios?.length ? <ul>{detail.servicios.map(service => <li key={service.id}><button className="btn btn-link text-start" onClick={() => setSelected({ kind: 'servicios', id: service.id })}>{service.nombre}</button></li>)}</ul> : <p>No tiene servicios publicados.</p>}</>}</>}</Modal.Body>
-      <Modal.Footer><button className="btn btn-secondary" onClick={() => setSelected(null)}>Cerrar</button></Modal.Footer>
-    </Modal>
+    const timeout = setTimeout(() => controller.abort(), 6000);
+    let active = true;
+    async function checkPortal() {
+      try {
+        const response = await fetch(new URL('api/v1/salud', portalUrl), {
+          signal: controller.signal, credentials: 'omit', cache: 'no-store',
+        });
+        if (!response.ok) throw new Error('Service unavailable');
+        const data = await response.json();
+        if (data.identificador !== 'SRV-G5202605') throw new Error('Unexpected service');
+        if (active) {
+          setPersistent(data.base_de_datos?.estado === 'CONECTADO');
+          setStatus('ready');
+        }
+      } catch {
+        if (active) setStatus('error');
+      } finally { clearTimeout(timeout); }
+    }
+    void checkPortal();
+    return () => { active = false; clearTimeout(timeout); controller.abort(); };
+  }, [attempt]);
+
+  function reload() { setStatus('loading'); setAttempt(value => value + 1); }
+
+  return <main className="additional-portal">
+    {sessionError && <div className="alert alert-warning" role="alert">{sessionError}</div>}
+    <div className="additional-portal-toolbar">
+      <h1>Servicios adicionales</h1>
+      <div className="additional-portal-actions">
+        {portalUrl && <a className="btn btn-outline-primary btn-sm" href={portalUrl} target="_blank" rel="noopener noreferrer">Abrir en otra pestaña</a>}
+        <button className="btn btn-outline-secondary btn-sm" disabled={!portalUrl || status === 'loading'} onClick={reload}>Recargar portal</button>
+      </div>
+    </div>
+    {!portalUrl ? <div className="alert alert-warning" role="alert">La dirección del portal no está configurada correctamente. Contacta al administrador.</div>
+      : status === 'loading' ? <div className="empty-state" role="status">Cargando el portal de servicios adicionales…</div>
+      : status === 'error' ? <div className="alert alert-warning" role="alert">
+        <h2 className="h5">No se pudo conectar con Servicios adicionales</h2>
+        <p>Comprueba que el servicio esté iniciado. Puedes reintentar o abrir el portal en otra pestaña.</p>
+        <button className="btn btn-outline-dark btn-sm" onClick={reload}>Reintentar</button>
+      </div>
+      : <>
+        {!persistent && <div className="alert alert-warning" role="status">El portal está en modo de demostración: los cambios no se guardarán en MySQL.</div>}
+        <iframe
+          ref={frame}
+          key={attempt}
+          className="additional-portal-frame"
+          src={portalUrl}
+          title="Directorio comercial: catálogo, proveedores, registro, portal de empresa y panel de demostración"
+          referrerPolicy="no-referrer"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox"
+        />
+      </>}
   </main>;
 }

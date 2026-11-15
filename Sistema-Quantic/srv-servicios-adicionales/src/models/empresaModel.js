@@ -84,15 +84,16 @@ let memoriaEmpresas = [
   }
 ];
 
+memoriaEmpresas.forEach(company => Object.assign(company, { ofrece_servicios: true, provee_equipos: false }));
 let nextEmpresaId = 6;
 
 class EmpresaModel {
   // Crear una nueva empresa (Siempre nace con estado 'PENDIENTE')
-  static async create({ razon_social, ruc, email_contacto, telefono, sitio_web, direccion, ciudad, descripcion }) {
+  static async create({ razon_social, ruc, email_contacto, telefono, sitio_web, direccion, ciudad, descripcion, ofrece_servicios = true, provee_equipos = false }) {
     if (db.isMySQLConnected()) {
       const sql = `
-        INSERT INTO empresas (razon_social, ruc, email_contacto, telefono, sitio_web, direccion, ciudad, descripcion, estado_verificacion)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PENDIENTE')
+        INSERT INTO empresas (razon_social, ruc, email_contacto, telefono, sitio_web, direccion, ciudad, descripcion, ofrece_servicios, provee_equipos, estado_verificacion)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDIENTE')
       `;
       const result = await db.query(sql, [
         razon_social,
@@ -102,10 +103,11 @@ class EmpresaModel {
         sitio_web || null,
         direccion || null,
         ciudad || 'Lima',
-        descripcion || null
+        descripcion || null, ofrece_servicios, provee_equipos
       ]);
       return {
         id: result.insertId,
+        ofrece_servicios, provee_equipos,
         razon_social,
         ruc,
         email_contacto,
@@ -121,6 +123,7 @@ class EmpresaModel {
     // Modo Demostración en memoria
     const nuevaEmpresa = {
       id: nextEmpresaId++,
+      ofrece_servicios, provee_equipos,
       razon_social,
       ruc,
       email_contacto,

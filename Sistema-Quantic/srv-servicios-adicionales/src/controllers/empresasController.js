@@ -14,6 +14,8 @@ class EmpresasController {
    */
   static async registrarEmpresa(req, res) {
     try {
+      const flags = require('../companyRegistry').capabilities({ ofrece_servicios: req.body.ofrece_servicios ?? true, provee_equipos: req.body.provee_equipos ?? false });
+      if (!flags.ofrece_servicios && req.body.servicios_iniciales?.length) return res.status(400).json({ mensaje: 'Una empresa de equipos no puede registrar servicios sin seleccionar esa actividad.' });
       const {
         razon_social,
         ruc,
@@ -73,6 +75,7 @@ class EmpresasController {
 
       // 3. Crear empresa en estado PENDIENTE
       const nuevaEmpresa = await EmpresaModel.create({
+        ...flags,
         razon_social: razon_social.trim(),
         ruc: ruc.trim(),
         email_contacto: email_contacto.trim(),
@@ -111,6 +114,7 @@ class EmpresasController {
         }
       });
     } catch (error) {
+      if (error.status) return res.status(error.status).json({ mensaje: error.message });
       console.error('[EmpresasController.registrarEmpresa] Error:', error);
       return res.status(500).json({
         status: 'error',
@@ -170,7 +174,7 @@ class EmpresasController {
         });
       }
 
-      const servicios = await ServicioModel.getByEmpresaId(empresa.id, true);
+      const servicios = empresa.ofrece_servicios ? await ServicioModel.getByEmpresaId(empresa.id, true) : [];
 
       return res.status(200).json({
         status: 'success',

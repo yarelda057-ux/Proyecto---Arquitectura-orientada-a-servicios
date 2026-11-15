@@ -4,7 +4,7 @@ const path = require('node:path');
 const { randomBytes, createHash } = require('node:crypto');
 const root = path.resolve(__dirname, '..');
 const random = () => randomBytes(32).toString('hex');
-const services = ['server', 'servicio-de-mayoristas', 'integration-esb', 'notification-service', 'srv-servicios-adicionales', 'audit-service', 'vite-project'];
+const services = ['server', 'servicio-de-mayoristas', 'integration-esb', 'notification-service', 'srv-servicios-adicionales', 'audit-service', 'vite-project', 'reports-service'];
 const destinations = services.map(name => path.join(name, '.env')).concat('audit-service/clients.local.json');
 const existing = destinations.filter(name => fs.existsSync(path.join(root, name)));
 if (existing.length) {
@@ -12,7 +12,7 @@ if (existing.length) {
   console.error('Este comando es solo para una copia nueva. Conserva tus archivos existentes.');
   process.exit(1);
 }
-const wholesale = random(), esb = random(), soap = random(), auditWrite = random(), auditRead = random();
+const wholesale = random(), esb = random(), soap = random(), auditWrite = random(), auditRead = random(), reports = random();
 const overrides = {
   server: { JWT_SECRET: random(), WHOLESALE_SERVICE_URL: 'http://127.0.0.1:3001', WHOLESALE_INTEGRATION_KEY: wholesale, INTEGRATION_ESB_URL: 'http://127.0.0.1:8003', INTEGRATION_ESB_KEY: esb, AUDIT_ENABLED: 'true', AUDIT_SERVICE_URL: 'http://127.0.0.1:8001', AUDIT_WRITE_KEY: auditWrite, AUDIT_READ_KEY: auditRead },
   'servicio-de-mayoristas': { JWT_SECRET: random(), INTEGRATION_KEY: wholesale, INTEGRATION_ESB_URL: 'http://127.0.0.1:8003', INTEGRATION_ESB_KEY: esb, CLIENT_ORIGINS: 'http://localhost:5173' },
@@ -22,6 +22,15 @@ const overrides = {
   'audit-service': {}, 'vite-project': {},
 };
 // Leer y preparar todo antes de escribir para detectar plantillas faltantes.
+overrides.server.REPORTS_INTEGRATION_KEY = reports;
+overrides['integration-esb'].REPORTS_SERVICE_URL = 'http://127.0.0.1:8004';
+overrides['integration-esb'].WHOLESALE_SERVICE_URL = 'http://127.0.0.1:3001';
+overrides['reports-service'] = { REPORTS_CLIENTS_JSON: JSON.stringify({ 'inventory-gateway': { secret: reports, scopes: ['reports:read', 'reports:write'] } }), SOURCE_ESB_KEY: esb };
+const companyKey = random();
+overrides.server.COMPANY_INTEGRATION_KEY = companyKey;
+overrides['servicio-de-mayoristas'].COMPANY_INTEGRATION_KEY = companyKey;
+overrides['srv-servicios-adicionales'].COMPANY_INTEGRATION_KEY = companyKey;
+overrides['srv-servicios-adicionales'].WHOLESALE_INTEGRATION_KEY = wholesale;
 const files = services.map(name => {
   let content = fs.readFileSync(path.join(root, name, '.env.example'), 'utf8');
   for (const [key, value] of Object.entries(overrides[name])) {

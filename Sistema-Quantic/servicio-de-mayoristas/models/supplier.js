@@ -4,6 +4,7 @@ const { Schema, model } = mongoose;
 
 const supplierSchema = new Schema({
   supplierId: { type: String, required: true, unique: true, trim: true, uppercase: true, maxlength: 64 },
+  companyRuc: { type: String, unique: true, sparse: true, match: /^\d{11}$/ },
   nombre: { type: String, required: true, trim: true, maxlength: 160 },
   ruc: { type: String, trim: true, match: /^\d{11}$/ },
   correoContacto: { type: String, required: true, trim: true, lowercase: true, maxlength: 254 },

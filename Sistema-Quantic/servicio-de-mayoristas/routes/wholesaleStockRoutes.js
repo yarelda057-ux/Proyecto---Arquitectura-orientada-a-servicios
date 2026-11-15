@@ -1,4 +1,6 @@
 import { presentationWorkbook } from '../presentationWorkbook.js';
+import { classifyCategory, inferCategory, productCategory } from '../services/categories.js';
+import { captureSnapshot, readSnapshot, snapshotProduct, StockSnapshot } from '../services/stockSnapshots.js';
 import { Router, mongoose, ExcelJS } from '../dependencies.js';
 
 import { createHash, randomUUID } from 'node:crypto';
@@ -9,7 +11,8 @@ import SupplierStock from '../models/supplierStock.js';
 import StockBatch from '../models/stockBatch.js';
 import StockVersion from '../models/stockVersion.js';
 import User from '../models/user.js';
-import Session from '../models/session.js';
+
+import { companyByRuc, assertCompany } from '../services/companyRegistry.js';
 import NotificationOutbox from '../models/notificationOutbox.js';
 import { enqueueNotification } from '../services/notificationOutboxWorker.js';
 
@@ -82,6 +85,7 @@ function publicProduct(product, supplierNames = new Map()) {
     cantidad: product.cantidad,
     precioUsd: product.precioUsd,
     categoria: product.categoria,
+    categoriaOrigen: product.categoriaOrigen,
     versionInventario: product.versionInventario,
     actualizadoEn: product.updatedAt,
   };
@@ -170,10 +174,14 @@ async function parseWorkbook(buffer) {
   const seenPartNumbers = new Set();
   let totalFilas = 0;
   let filasCorrectas = 0;
+  let sectionCategory = null;
   for (let index = headerRow + 1; index <= sheet.rowCount; index++) {
     const excelRow = sheet.getRow(index);
     const first = excelRow.getCell(indices.partNumber + 1);
-    if (first.isMerged && required.every(field => excelRow.getCell(indices[field] + 1).master.address === first.master.address)) continue;
+    if (first.isMerged && required.every(field => excelRow.getCell(indices[field] + 1).master.address === first.master.address)) {
+      sectionCategory = inferCategory(first.master.value);
+      continue;
+    }
     const row = valuesOf(excelRow);
     if (required.every(field => HEADER_ALIASES[field].has(normalizedHeader(row[indices[field]])))) continue;
     if (!row.some(hasValue)) continue;
@@ -181,7 +189,10 @@ async function parseWorkbook(buffer) {
     const qtyRaw = row[indices.cantidad];
     const priceRaw = row[indices.precioUsd];
     // Las filas de título de categoría (por ejemplo, “Firewalls solo HW”) no son datos.
-    if (!hasValue(partRaw) && !hasValue(qtyRaw) && !hasValue(priceRaw)) continue;
+    if (!hasValue(partRaw) && !hasValue(qtyRaw) && !hasValue(priceRaw)) {
+      sectionCategory = inferCategory(row[indices.descripcion]);
+      continue;
+    }
     totalFilas++;
     if (totalFilas > MAX_ROWS) throw error(413, `El archivo supera el máximo de ${MAX_ROWS} filas.`);
     const rowNumber = index;
@@ -189,7 +200,7 @@ async function parseWorkbook(buffer) {
     const descripcion = text(String(row[indices.descripcion] ?? ''), 1000);
     const cantidad = typeof qtyRaw === 'number' ? qtyRaw : Number(String(qtyRaw ?? '').trim());
     const precioUsd = parsePrice(priceRaw);
-    const categoria = indices.categoria === undefined ? 'Sin categoría' : (text(String(row[indices.categoria] ?? ''), 160) || 'Sin categoría');
+    const category = classifyCategory({ explicit: indices.categoria === undefined ? '' : text(String(row[indices.categoria] ?? ''), 160), section: sectionCategory, description: descripcion });
     let valid = true;
     if (!partNumber) { errores.push({ fila: rowNumber, campo: 'PartNumber', motivo: 'Es obligatorio y debe tener como máximo 160 caracteres.' }); valid = false; }
     else if (seenPartNumbers.has(partNumber.toUpperCase())) { errores.push({ fila: rowNumber, campo: 'PartNumber', motivo: 'El producto está repetido dentro del archivo.' }); valid = false; }
@@ -199,7 +210,7 @@ async function parseWorkbook(buffer) {
     if (!valid) continue;
     seenPartNumbers.add(partNumber.toUpperCase());
     filasCorrectas++;
-    filas.push({ partNumber, descripcion, cantidad, precioUsd: Number(precioUsd.toFixed(2)), categoria });
+    filas.push({ partNumber, descripcion, cantidad, precioUsd: Number(precioUsd.toFixed(2)), ...category });
   }
   if (!totalFilas) errores.push({ fila: 2, campo: 'archivo', motivo: 'No se detectaron filas de productos.' });
   return { totalFilas, filasCorrectas, filas: errores.length ? [] : filas, errores };
@@ -236,10 +247,13 @@ function batchStatus(batch) {
 }
 
 function validationReport(batch) {
+  const categories = new Map();
+  for (const row of batch.filas || []) { const { categoria } = productCategory(row); categories.set(categoria, (categories.get(categoria) || 0) + 1); }
   return {
     idLote: batch.batchId,
     estado: batch.estado,
     esValido: batch.estado === 'VALIDADO' || batch.estado === 'PROCESADO',
+    categorias: [...categories].map(([categoria, productos]) => ({ categoria, productos })),
     filasCorrectas: batch.filasCorrectas,
     filasErroneas: batch.errores?.length || 0,
     errores: batch.errores || [],
@@ -274,14 +288,17 @@ async function applyBatch(batch, actorId) {
     const operations = batch.filas.map(row => ({
       updateOne: {
         filter: { supplierId: batch.supplierId, partNumber: row.partNumber },
-        update: { $set: { descripcion: row.descripcion, cantidad: row.cantidad, precioUsd: row.precioUsd, categoria: row.categoria, versionInventario, lastBatchId: batch.batchId, updatedBy: actorId } },
+        update: { $set: { descripcion: row.descripcion, cantidad: row.cantidad, precioUsd: row.precioUsd, ...productCategory(row), versionInventario, lastBatchId: batch.batchId, updatedBy: actorId } },
         upsert: true,
       },
     }));
     const options = { ordered: true };
     if (session) options.session = session;
     await SupplierStock.bulkWrite(operations, options);
-    return { idLote: batch.batchId, estado: 'PROCESADO', productosActualizados: operations.length, versionInventario };
+    await captureSnapshot({ versionInventario, actorId, batchId: batch.batchId, operationId: batch.idOperacion || batch.batchId, session });
+    const result = { idLote: batch.batchId, estado: 'PROCESADO', productosActualizados: operations.length, versionInventario };
+    await StockBatch.updateOne({ _id: batch._id, estado: 'PROCESANDO' }, { $set: { estado: 'PROCESADO', versionInventario, confirmationResult: result, processedAt: new Date() } }, { session });
+    return result;
   };
   const session = await mongoose.startSession();
   try {
@@ -289,18 +306,23 @@ async function applyBatch(batch, actorId) {
     await session.withTransaction(async () => { result = await write(session); });
     return result;
   } catch (err) {
-    // MongoDB local puede ejecutarse sin replica set. Conservamos la operación funcional
-    // y el despliegue productivo usa la transacción anterior.
+    // No publicar cambios parciales si el servidor no admite transacciones.
     if (!transactionsUnavailable(err)) throw err;
-    return write(null);
+    throw error(503, 'Se requiere MongoDB replica set para confirmar inventario de forma atómica.');
   } finally {
     await session.endSession();
   }
 }
 
 const router = Router();
+async function requireStockCompany(supplierId) {
+  const supplier = await getSupplier(supplierId, { activeOnly: true });
+  assertCompany(await companyByRuc(supplier.ruc), true);
+  return supplier;
+}
 router.use(validateAuth);
 router.use(async (req, res, next) => {
+  if (req.user.role === 'mayorista') assertCompany(req.user.company, true);
   if (req.user.role === 'mayorista') await getSupplier(req.user.supplierId, { activeOnly: true });
   if (!['GET', 'HEAD'].includes(req.method) && !['admin', 'mayorista'].includes(req.user.role)) return res.status(403).json({ message: 'No tienes permiso para modificar stock de mayoristas.' });
   next();
@@ -308,24 +330,25 @@ router.use(async (req, res, next) => {
 
 router.get('/proveedores', async (req, res) => {
   const filter = req.user.role === 'mayorista' ? { supplierId: req.user.supplierId } : {};
-  const suppliers = await Supplier.find(filter).sort({ nombre: 1 }).lean();
+  let suppliers = await Supplier.find(filter).sort({ nombre: 1 }).lean();
+  if (req.query.stock === '1') {
+    const allowed = await Promise.all(suppliers.map(async supplier => {
+      if (!supplier.activo) return false;
+      try { assertCompany(await companyByRuc(supplier.ruc), true); return true; }
+      catch (err) { if (err.status === 403) return false; throw err; }
+    }));
+    suppliers = suppliers.filter((_supplier, index) => allowed[index]);
+  }
   const accounts = req.user.role === 'admin' ? await User.find({ role: 'mayorista', supplierId: { $in: suppliers.map(supplier => supplier.supplierId) }, isActive: { $ne: false } }).select('_id email supplierId').lean() : [];
   res.json({ proveedores: suppliers.map(supplier => ({ ...publicSupplier(supplier), ...(req.user.role === 'admin' ? { accesos: accounts.filter(account => account.supplierId === supplier.supplierId).map(account => ({ id: String(account._id), email: account.email })) } : {}) })) });
 });
 
 router.post('/proveedores', requireAdmin, async (req, res) => {
-  assertOnly(req.body, ['nombre', 'ruc', 'correoContacto', 'periodoActualizacionDias']);
-  const nombre = text(req.body.nombre, 160);
-  const ruc = req.body.ruc === undefined || req.body.ruc === '' ? undefined : text(req.body.ruc, 11);
-  const correoContacto = text(req.body.correoContacto, 254)?.toLowerCase();
-  const periodoActualizacionDias = req.body.periodoActualizacionDias === undefined ? 30 : Number(req.body.periodoActualizacionDias);
-  if (!nombre || (ruc && !/^\d{11}$/.test(ruc)) || !isEmail(correoContacto) || !Number.isInteger(periodoActualizacionDias) || periodoActualizacionDias < 1 || periodoActualizacionDias > 365) throw error(400, 'Datos del proveedor inválidos.');
-  const supplierId = `MAY-${randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase()}`;
-  const supplier = await Supplier.create({ supplierId, nombre, ...(ruc ? { ruc } : {}), correoContacto, periodoActualizacionDias, notificationSyncStatus: 'pending', notificationRevision: 1 });
-  res.status(201).json({ proveedor: publicSupplier(supplier) });
+  return res.status(410).json({ message: 'Registra la empresa y sus accesos desde Servicios adicionales.' });
 });
 
 router.put('/proveedores/:idMayorista', requireAdmin, async (req, res) => {
+  if (['nombre', 'ruc', 'correoContacto', 'activo'].some(field => field in (req.body || {}))) return res.status(410).json({ message: 'Gestiona los datos y estado de la empresa desde Servicios adicionales.' });
   assertOnly(req.body, ['nombre', 'ruc', 'correoContacto', 'periodoActualizacionDias', 'activo']);
   const updates = {};
   if ('nombre' in req.body) { const value = text(req.body.nombre, 160); if (!value) throw error(400, 'Nombre inválido.'); updates.nombre = value; }
@@ -367,34 +390,17 @@ router.put('/notificaciones/:idMayorista/mensaje', requireAdmin, async (req,res)
 });
 
 router.post('/proveedores/:idMayorista/usuarios', requireAdmin, async (req, res) => {
-  assertOnly(req.body, ['email', 'password']);
-  const supplierId = normalizeSupplierId(req.params.idMayorista);
-  await getSupplier(supplierId, { activeOnly: true });
-  const email = text(req.body.email, 254)?.toLowerCase();
-  const password = req.body.password;
-  if (!isEmail(email) || typeof password !== 'string' || [...password].length < 15 || Buffer.byteLength(password) > 72) throw error(400, 'Correo o contraseña inválidos.');
-  if (await User.exists({ supplierId, role: 'mayorista', isActive: { $ne: false } })) throw error(409, 'El mayorista ya tiene acceso.');
-  const user = await User.create({ email, password, role: 'mayorista', supplierId });
-  res.status(201).json({ usuario: { id: String(user._id), email: user.email, role: user.role, idMayorista: supplierId } });
+  return res.status(410).json({ message: 'Gestiona los accesos desde Servicios adicionales.' });
 });
 
 router.put('/proveedores/:idMayorista/usuarios/:idUsuario/password', requireAdmin, async (req, res) => {
-  assertOnly(req.body, ['password']);
-  const supplierId = normalizeSupplierId(req.params.idMayorista);
-  await getSupplier(supplierId, { activeOnly: true });
-  const password = req.body.password;
-  if (!mongoose.isObjectIdOrHexString(req.params.idUsuario) || typeof password !== 'string' || [...password].length < 15 || Buffer.byteLength(password) > 72) throw error(400, 'Contraseña o usuario inválidos.');
-  const user = await User.findOne({ _id: req.params.idUsuario, supplierId, role: 'mayorista', isActive: { $ne: false } }).select('+password');
-  if (!user) throw error(404, 'Cuenta no encontrada.');
-  user.password = password;
-  await user.save();
-  await Session.deleteMany({ userId: user._id });
-  res.json({ message: 'Contraseña actualizada. Las sesiones anteriores se cerraron.' });
+  return res.status(410).json({ message: 'Gestiona las contrasenas desde Servicios adicionales.' });
 });
 
 router.post('/upload', async (req, res) => {
   const key = idempotencyKey(req);
   const { supplierId, buffer, contentHash } = extractFile(req.body);
+  await requireStockCompany(supplierId);
   ensureSupplierAccess(req, supplierId);
   await getSupplier(supplierId, { activeOnly: true });
   const existing = await StockBatch.findOne({ supplierId, idempotencyKey: key });
@@ -451,7 +457,7 @@ router.get('/lotes/:idLote/preview', async (req, res) => {
   if (!batch) throw error(404, 'Lote no encontrado.');
   ensureSupplierAccess(req, batch.supplierId);
   const { page, pageSize } = pagination(req.query);
-  res.json({ items: batch.filas.slice((page - 1) * pageSize, page * pageSize), total: batch.filas.length, errores: batch.errores, estado: batch.estado });
+  res.json({ items: batch.filas.slice((page - 1) * pageSize, page * pageSize).map(row => ({ ...row, ...productCategory(row) })), total: batch.filas.length, errores: batch.errores, estado: batch.estado });
 });
 router.get('/lotes/:idLote/excel', async (req, res) => {
   const batch = await StockBatch.findOne({ batchId: req.params.idLote }).lean();
@@ -488,6 +494,7 @@ router.post('/lotes/:idLote/confirmacion', async (req, res) => {
   if (!batchId) throw error(400, 'Lote inválido.');
   let batch = await StockBatch.findOne({ batchId });
   if (!batch) throw error(404, 'Lote no encontrado.');
+  await requireStockCompany(batch.supplierId);
   ensureSupplierAccess(req, batch.supplierId);
   if (batch.estado === 'PROCESADO') { const batchSupplier = await Supplier.findOne({ supplierId: batch.supplierId }).select('notificationsEnabled').lean(); if(batchSupplier?.notificationsEnabled!==false) await enqueueNotification('catalog:' + batch.batchId, 'catalog-updated', batch.supplierId, { catalogAt: batch.processedAt }); return res.json(batch.confirmationResult); }
   if (batch.estado !== 'VALIDADO') throw error(409, 'El lote no se puede confirmar en su estado actual.');
@@ -500,7 +507,6 @@ router.post('/lotes/:idLote/confirmacion', async (req, res) => {
   try {
     const result = await applyBatch(batch, req.user._id);
     const processedAt = new Date();
-    await StockBatch.updateOne({ _id: batch._id, estado: 'PROCESANDO' }, { $set: { estado: 'PROCESADO', versionInventario: result.versionInventario, confirmationResult: result, processedAt } });
     const batchSupplier = await Supplier.findOne({ supplierId: batch.supplierId }).select('notificationsEnabled').lean();
     if (batchSupplier?.notificationsEnabled !== false) await enqueueNotification('catalog:' + batch.batchId, 'catalog-updated', batch.supplierId, { catalogAt: processedAt });
     res.json(result);
@@ -508,6 +514,45 @@ router.post('/lotes/:idLote/confirmacion', async (req, res) => {
     await StockBatch.updateOne({ _id: batch._id, estado: 'PROCESANDO' }, { $set: { estado: 'FALLIDO' } });
     throw err;
   }
+});
+
+// Interfaz de lectura consistente para consumidores analíticos. No expone MongoDB.
+router.get('/eventos-stock', requireAdmin, async (req, res) => {
+  assertOnly(req.query, ['despues']);
+  const after = Number(req.query.despues || 0);
+  if (!Number.isSafeInteger(after) || after < 0) throw error(400, 'Secuencia invalida.');
+  const items = await StockSnapshot.find({ sequence: { $gt: after } }).sort({ sequence: 1 }).limit(25).select('-chunks -total').lean();
+  res.set('Cache-Control', 'no-store').json({ eventos: items.map(item => ({ versionInventario: item._id, secuencia: item.sequence, actorId: item.actorId, idLote: item.batchId, idOperacion: item.operationId, actualizadoEn: item.actualizadoEn })) });
+});
+
+router.get('/snapshot', async (req, res) => {
+  assertOnly(req.query, ['versionInventario']);
+  const expected = req.query.versionInventario === undefined ? undefined : text(req.query.versionInventario, 100);
+  if (req.query.versionInventario !== undefined && !expected) throw error(400, 'Versión inválida.');
+  if (expected) {
+    const saved = await readSnapshot(expected, req.user.role === 'mayorista' ? req.user.supplierId : undefined);
+    if (saved) return res.set('Cache-Control', 'no-store').json(saved);
+  }
+  const filter = req.user.role === 'mayorista' ? { supplierId: req.user.supplierId } : {};
+  const session = await mongoose.startSession();
+  try {
+    let snapshot;
+    await session.withTransaction(async () => {
+      // Ante escrituras antiguas inconclusas no publicar una imagen como confirmada.
+      const uncertain = await StockBatch.exists({ estado: { $in: ['PROCESANDO', 'FALLIDO'] } }).session(session);
+      if (uncertain) throw error(503, 'Hay lotes pendientes de verificación; el inventario no puede presentarse como vigente.');
+      const current = await StockVersion.findById('supplier-stock').session(session).lean();
+      const versionInventario = `INV-${String(current?.sequence || 0).padStart(6, '0')}`;
+      if (expected && expected !== versionInventario) throw error(409, 'La versión solicitada ya no está disponible.');
+      const products = await SupplierStock.find(filter).sort({ _id: 1 }).limit(100001).session(session).lean();
+      if (products.length > 100000) throw error(503, 'El inventario excede el límite de la consulta analítica.');
+      snapshot = { versionInventario, revisionInventario: current?.sequence || 0, actualizadoEn: current?.updatedAt || new Date(0), total: products.length, productos: products.map(snapshotProduct) };
+    }, { readConcern: { level: 'snapshot' }, writeConcern: { w: 'majority' }, maxCommitTimeMS: 4000 });
+    res.set('Cache-Control', 'no-store').json(snapshot);
+  } catch (err) {
+    if (transactionsUnavailable(err)) throw error(503, 'Se requiere MongoDB replica set para consultar una versión consistente.');
+    throw err;
+  } finally { await session.endSession(); }
 });
 
 router.get('/products', async (req, res) => {
@@ -552,16 +597,27 @@ router.put('/products/:idProducto', async (req, res) => {
   assertOnly(req.body, ['idMayorista', 'stockNuevo', 'motivo', 'versionEsperada']);
   const product = await SupplierStock.findById(req.params.idProducto).lean();
   if (!product) throw error(404, 'Producto no encontrado.');
+  await requireStockCompany(product.supplierId);
   ensureSupplierAccess(req, product.supplierId);
   const supplierId = normalizeSupplierId(req.body.idMayorista);
   const stockNuevo = req.body.stockNuevo;
   const motivo = text(req.body.motivo, 300);
   const versionEsperada = text(req.body.versionEsperada, 64);
   if (supplierId !== product.supplierId || !Number.isInteger(stockNuevo) || stockNuevo < 0 || !motivo || !versionEsperada || versionEsperada !== product.versionInventario) throw error(400, 'Datos de ajuste inválidos.');
-  const versionInventario = await allocateVersion(null);
-  const updated = await SupplierStock.findOneAndUpdate({ _id: product._id, versionInventario: versionEsperada }, { $set: { cantidad: stockNuevo, versionInventario, updatedBy: req.user._id } }, { new: true, runValidators: true });
-  if (!updated) throw error(409, 'Conflicto de versión. Actualiza los datos antes de reintentar.');
-  res.json({ idProducto: String(updated._id), stockAnterior: product.cantidad, stockActual: updated.cantidad, versionInventario: updated.versionInventario });
+  const session = await mongoose.startSession();
+  try {
+    let updated;
+    await session.withTransaction(async () => {
+      const versionInventario = await allocateVersion(session);
+      updated = await SupplierStock.findOneAndUpdate({ _id: product._id, versionInventario: versionEsperada }, { $set: { cantidad: stockNuevo, versionInventario, updatedBy: req.user._id } }, { new: true, runValidators: true, session });
+      if (!updated) throw error(409, 'Conflicto de versión. Actualiza los datos antes de reintentar.');
+      await captureSnapshot({ versionInventario, actorId: req.user._id, operationId: 'ajuste-' + versionInventario, session });
+    });
+    res.json({ idProducto: String(updated._id), stockAnterior: product.cantidad, stockActual: updated.cantidad, versionInventario: updated.versionInventario });
+  } catch (err) {
+    if (transactionsUnavailable(err)) throw error(503, 'Se requiere MongoDB replica set para ajustar inventario.');
+    throw err;
+  } finally { await session.endSession(); }
 });
 
 export default router;

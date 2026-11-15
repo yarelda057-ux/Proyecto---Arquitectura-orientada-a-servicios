@@ -1,0 +1,45 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const request = require('./http-memory.cjs');
+const { sign } = require('../src/companySecurity');
+const key = 'company-routes-test-key-'.repeat(3);
+process.env.COMPANY_INTEGRATION_KEY = key;
+const app = require('../src/app');
+function token(role, ruc) { return sign({ sub: 'admin-or-company', role, ruc, iss: 'inventory-gateway', aud: 'company-api' }, key); }
+test('registration, review, activity changes and ownership enforce the complete company flow', async () => {
+  const registration = { razon_social: 'Empresa equipos', ruc: '20999888777', email_contacto: 'equipo@example.test', telefono: '900000000', ofrece_servicios: false, provee_equipos: true };
+  const created = await request(app, { method: 'POST', url: '/api/v1/catalogo/empresas', body: registration });
+  assert.equal(created.status, 201);
+  const id = created.body.datos.empresa.id;
+  assert.equal(created.body.datos.empresa.estado_verificacion, 'PENDIENTE');
+  assert.equal(created.body.datos.empresa.provee_equipos, true);
+  const admin = token('admin');
+  let response = await request(app, { url: '/api/v1/demo-admin/solicitudes' });
+  assert.equal(response.status, 401);
+  response = await request(app, { method: 'PATCH', url: '/api/v1/demo-admin/empresas/' + id + '/estado', token: token('mayorista', registration.ruc), body: { estado: 'APROBADO' } });
+  assert.equal(response.status, 403);
+  response = await request(app, { method: 'PATCH', url: '/api/v1/demo-admin/empresas/' + id + '/estado', token: admin, body: { estado: 'APROBADO' } });
+  assert.equal(response.status, 200);
+  const offer = { empresa_id: id, nombre: 'Soporte', categoria: 'Soporte tecnico' };
+  response = await request(app, { method: 'POST', url: '/api/v1/catalogo/servicios', token: token('mayorista', registration.ruc), body: offer });
+  assert.equal(response.status, 403);
+  response = await request(app, { method: 'PATCH', url: '/api/v1/integracion/empresas/' + id + '/actividades', token: token('mayorista', registration.ruc), body: { ofrece_servicios: true, provee_equipos: true } });
+  assert.equal(response.status, 403);
+  response = await request(app, { method: 'PATCH', url: '/api/v1/integracion/empresas/' + id + '/actividades', token: admin, body: { ofrece_servicios: true, provee_equipos: true } });
+  assert.equal(response.status, 200);
+  response = await request(app, { method: 'POST', url: '/api/v1/catalogo/servicios', token: token('mayorista', registration.ruc), body: offer });
+  assert.equal(response.status, 201);
+  response = await request(app, { method: 'PUT', url: '/api/v1/catalogo/empresas/' + id, token: token('mayorista', '20601234561'), body: { telefono: '111111111' } });
+  assert.equal(response.status, 403);
+  response = await request(app, { url: '/api/v1/catalogo/empresas/perfil/ruc/' + registration.ruc });
+  assert.equal(response.status, 401);
+  response = await request(app, { method: 'PATCH', url: '/api/v1/demo-admin/empresas/' + id + '/estado', token: admin, body: { estado: 'INACTIVO' } });
+  assert.equal(response.status, 200);
+  response = await request(app, { method: 'POST', url: '/api/v1/catalogo/servicios', token: token('mayorista', registration.ruc), body: offer });
+  assert.equal(response.status, 403);
+});
+test('stock integration rejects demonstration memory as an authoritative registry', async () => {
+  const integration = sign({ sub: 'stock', role: 'integration', iss: 'wholesale-integration', aud: 'company-api' }, key);
+  const res = await request(app, { url: '/api/v1/integracion/empresas/ruc/20601234561', token: integration });
+  assert.equal(res.status, 503);
+});

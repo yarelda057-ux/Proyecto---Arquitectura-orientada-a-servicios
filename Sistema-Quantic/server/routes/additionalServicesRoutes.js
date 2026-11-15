@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import jwt from 'jsonwebtoken';
 import validateAuth from '../Middleware/authMiddleware.js';
 import { additionalServicesRequest } from '../services/additionalServicesClient.js';
 
@@ -8,6 +9,12 @@ export function createAdditionalServicesRouter({ authenticate = validateAuth } =
   router.use((req, res, next) => {
     if (!['admin', 'user', 'mayorista'].includes(req.user?.role)) return res.status(403).json({ message: 'Tu cuenta no tiene permiso para consultar este módulo.' });
     next();
+  });
+  router.post('/portal-session', (req, res) => {
+    const key = process.env.COMPANY_INTEGRATION_KEY;
+    if (!key || key.length < 32) return res.status(503).json({ message: 'Falta configurar la integracion de empresas.' });
+    const token = jwt.sign({ role: req.user.role, email: req.user.email, ...(req.user.company?.ruc ? { ruc: req.user.company.ruc } : {}) }, key, { algorithm: 'HS256', subject: String(req.user._id), issuer: 'inventory-gateway', audience: 'company-api', expiresIn: 60 });
+    res.set('Cache-Control', 'no-store').json({ token });
   });
   router.get(['/:resource', '/:resource/:id'], async (req, res) => {
     const { resource, id } = req.params;

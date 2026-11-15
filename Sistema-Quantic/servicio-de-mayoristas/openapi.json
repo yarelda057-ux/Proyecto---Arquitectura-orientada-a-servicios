@@ -2,7 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Servicio de Gestión de Stock de Mayoristas",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "description": "La columna Categoria es opcional: prioridad categoria explicita, seccion reconocida, descripcion y finalmente Sin categoria. La confirmacion conserva stock, snapshot y evento dentro de la misma transaccion."
   },
   "servers": [
     {
@@ -775,6 +776,58 @@
                 ]
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/stock/eventos-stock": {
+      "get": {
+        "summary": "Eventos durables de versiones confirmadas (solo administrador o coordinador).",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "despues",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "eventos: hasta 25 elementos ordenados con versionInventario, secuencia, actorId, idLote, idOperacion, actualizadoEn."
+          },
+          "400": {
+            "description": "Secuencia invalida"
+          },
+          "403": {
+            "description": "No autorizado"
+          }
+        }
+      }
+    },
+    "/api/v1/stock/snapshot": {
+      "get": {
+        "summary": "Inventario completo y consistente, o version historica exacta. El alcance del mayorista se aplica tambien al historico.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "versionInventario",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "versionInventario, revisionInventario, actualizadoEn, total y productos. Cada producto contiene idProducto, idMayorista, nombre, stock, categoria y categoriaOrigen."
+          },
+          "409": {
+            "description": "Version no conservada"
+          },
+          "503": {
+            "description": "Replica set no disponible o version incompleta"
           }
         }
       }

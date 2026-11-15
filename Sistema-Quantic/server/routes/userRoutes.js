@@ -10,7 +10,7 @@ import User from '../models/user.js';
 import Session from '../models/session.js';
 const router = Router();
 const dummyHash = await bcrypt.hash(randomUUID(), 12);
-const profile = (user, exp) => ({ email: user.email, role: user.role, idMayorista: user.supplierId || null, expiresAt: exp * 1000, serverTime: Date.now() });
+const profile = (user, exp) => ({ email: user.email, role: user.role, idMayorista: user.supplierId || null, company: user.company || null, canUploadStock: user.role === 'admin' || Boolean(user.company?.proveeEquipos), expiresAt: exp * 1000, serverTime: Date.now() });
 router.post('/login', loginLimiter(), async (req, res) => {
   const { email, password } = req.body || {};
   if (typeof email !== 'string' || email.length > 254 || typeof password !== 'string' || !password || Buffer.byteLength(password) > 72) return res.status(400).json({ message: 'Ingresa un correo y una contraseña válidos.' });

@@ -126,6 +126,7 @@ class ServiciosController {
       }
 
       const empresa = await EmpresaModel.getById(servicio.empresa_id);
+      if (!empresa || empresa.estado_verificacion !== 'APROBADO' || !empresa.ofrece_servicios) return res.status(404).json({ mensaje: 'Servicio no publicado.' });
 
       return res.status(200).json({
         status: 'success',

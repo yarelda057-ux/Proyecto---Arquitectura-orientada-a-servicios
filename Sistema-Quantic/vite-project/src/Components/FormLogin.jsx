@@ -8,7 +8,7 @@ export default function FormLogin() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [visible, setVisible] = useState(false);
-  if (user) return <Navigate to={user.role === 'mayorista' ? '/SupplierUpload' : '/Account'} replace />;
+  if (user) return <Navigate to={user.role === 'mayorista' ? (user.canUploadStock ? '/SupplierUpload' : '/AdditionalServices') : '/Account'} replace />;
   async function submit(event) {
     event.preventDefault(); setBusy(true); setError('');
     try { await fetchLogin({ email, password }); } catch (err) { setError(err.message); } finally { setBusy(false); }

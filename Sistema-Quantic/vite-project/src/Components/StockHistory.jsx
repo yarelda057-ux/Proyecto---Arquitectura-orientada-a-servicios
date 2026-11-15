@@ -1,11 +1,11 @@
 import Modal from 'react-bootstrap/Modal';
 import { useEffect, useState } from 'react';
 import { api } from '../services/http';
-export default function StockHistory({ supplierId, initialBatch }) {
+export default function StockHistory({ supplierId }) {
   const [date, setDate] = useState('');
   const [page, setPage] = useState(1);
   const [history, setHistory] = useState({ items: [], total: 0 });
-  const [selected, setSelected] = useState(initialBatch || '');
+  const [selected, setSelected] = useState('');
   const [previewPage, setPreviewPage] = useState(1);
   const [preview, setPreview] = useState({ items: [], total: 0 });
   const [error, setError] = useState('');
@@ -55,9 +55,9 @@ export default function StockHistory({ supplierId, initialBatch }) {
         <div className="sheet-toolbar"><div><span className="sheet-status">Solo lectura</span><span>{preview.total.toLocaleString('es-PE')} productos</span><span>{preview.estado || 'Consultando…'}</span></div><button className="btn btn-primary btn-sm" disabled={busy || previewLoading || Boolean(previewError)} onClick={() => download(selected)}>{busy ? 'Preparando…' : '↓ Descargar Excel con formato'}</button></div>
         {error && <p className="alert alert-danger m-3" role="alert">{error}</p>}
         {previewLoading ? <div className="empty-state" role="status">Preparando hoja de cálculo…</div> : previewError ? <p className="alert alert-danger m-3" role="alert">{previewError}</p> : <div className="sheet-canvas" tabIndex={0} aria-label="Hoja de productos, desplazable">
-          <table className="sheet-grid"><caption className="visually-hidden">Productos y precios de esta carga</caption><colgroup><col className="sheet-row-number" /><col className="sheet-code" /><col className="sheet-description" /><col className="sheet-quantity" /><col className="sheet-price" /></colgroup>
-            <thead><tr className="sheet-letters"><th aria-label="Número de fila"></th><th>A</th><th>B</th><th>C</th><th>D</th></tr><tr className="sheet-column-titles"><th>1</th><th scope="col">PartNumber</th><th scope="col">Descripción</th><th scope="col">QTY</th><th scope="col">Precio US$</th></tr></thead>
-            <tbody>{preview.items.map((row, index) => <tr key={index}><th scope="row">{(previewPage - 1) * 50 + index + 2}</th><td className="sheet-part">{row.partNumber}</td><td>{row.descripcion}</td><td className="sheet-numeric">{row.cantidad.toLocaleString('es-PE')}</td><td className="sheet-numeric">{row.precioUsd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td></tr>)}</tbody>
+          <table className="sheet-grid"><caption className="visually-hidden">Productos y precios de esta carga</caption><colgroup><col className="sheet-row-number" /><col className="sheet-code" /><col className="sheet-description" /><col className="sheet-quantity" /><col className="sheet-price" /><col className="sheet-category" /></colgroup>
+            <thead><tr className="sheet-letters"><th aria-label="Número de fila"></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr><tr className="sheet-column-titles"><th>1</th><th scope="col">PartNumber</th><th scope="col">Descripción</th><th scope="col">QTY</th><th scope="col">Precio US$</th><th scope="col">Categoría</th></tr></thead>
+            <tbody>{preview.items.map((row, index) => <tr key={index}><th scope="row">{(previewPage - 1) * 50 + index + 2}</th><td className="sheet-part">{row.partNumber}</td><td>{row.descripcion}</td><td className="sheet-numeric">{row.cantidad.toLocaleString('es-PE')}</td><td className="sheet-numeric">{row.precioUsd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td><td title={row.categoriaOrigen || ''}>{row.categoria || 'Sin categoría'}</td></tr>)}</tbody>
           </table>
           {!preview.items.length && <p className="empty-state">Esta carga no contiene productos válidos para mostrar.</p>}
         </div>}

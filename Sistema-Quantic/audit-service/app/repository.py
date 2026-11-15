@@ -34,7 +34,7 @@ class Repository:
         except DuplicateKeyError:
             existing = self.collection.find_one({"source": source, "event_id": str(event.event_id)})
             fields = event.model_dump(mode="json")
-            if existing is None or any(existing[k] != data[k] for k in fields):
+            if existing is None or any(existing.get(k) != data[k] for k in fields):
                 raise Conflict() from None
             return str(existing["_id"]), False
 

@@ -10,6 +10,7 @@ import devicesRoutes from './routes/devicesRoutes.js';
 import transceiversRoutes from './routes/transceiversRoutes.js';
 import wholesaleStockRoutes from './routes/wholesaleStockRoutes.js';
 import additionalServicesRoutes from './routes/additionalServicesRoutes.js';
+import reportsRoutes from './routes/reportsRoutes.js';
 export function createApp({ auditSink } = {}) {
   const app = express();
   const config = getConfig();
@@ -24,6 +25,7 @@ export function createApp({ auditSink } = {}) {
   app.use(express.json({ limit: '64kb' }));
   app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
   app.use('/api/additional-services', additionalServicesRoutes);
+  app.use('/api/v1/inventario', reportsRoutes);
   app.use('/api/users', userRoutes);
   app.use('/api/audit', auditRoutes);
   app.use('/api/devices', devicesRoutes);

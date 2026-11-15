@@ -173,7 +173,7 @@ class ServicioModel {
           e.direccion AS empresa_direccion
         FROM servicios s
         INNER JOIN empresas e ON s.empresa_id = e.id
-        WHERE s.estado = 'APROBADO' AND e.estado_verificacion = 'APROBADO'
+        WHERE s.estado = 'APROBADO' AND e.estado_verificacion = 'APROBADO' AND e.ofrece_servicios = TRUE
       `;
       const params = [];
 
@@ -208,7 +208,7 @@ class ServicioModel {
     const empresasMap = new Map(empresasAprobadas.map(e => [e.id, e]));
 
     return memoriaServicios
-      .filter(s => s.estado === 'APROBADO' && empresasMap.has(s.empresa_id))
+      .filter(s => s.estado === 'APROBADO' && empresasMap.has(s.empresa_id) && empresasMap.get(s.empresa_id).ofrece_servicios)
       .map(s => {
         const emp = empresasMap.get(s.empresa_id);
         return {

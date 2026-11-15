@@ -5,6 +5,20 @@ from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validato
 
 Method = Literal["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
 
+class AnalyticsFilters(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    categoria: str | None = Field(default=None, max_length=160)
+    idMayorista: str | None = Field(default=None, max_length=160)
+
+class AnalyticsContext(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    operation: Literal["INVENTORY_ANALYTICS"]
+    inventory_version: str | None = Field(default=None, max_length=100)
+    report_type: Literal["stockActual"] | None = None
+    filters: AnalyticsFilters | None = None
+    dashboard_id: str | None = Field(default=None, max_length=100)
+    indicators: list[Literal["totalProductos", "productosConStock", "productosSinStock", "unidadesDisponibles"]] | None = Field(default=None, max_length=4)
+
 class EventIn(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     event_id: UUID
@@ -15,6 +29,7 @@ class EventIn(BaseModel):
     status_code: int = Field(ge=100, le=599, strict=True)
     duration_ms: int = Field(ge=0, le=86400000, strict=True)
     request_id: UUID
+    context: AnalyticsContext | None = None
 
     @field_validator("occurred_at")
     @classmethod

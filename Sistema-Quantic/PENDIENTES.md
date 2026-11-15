@@ -1,5 +1,11 @@
 # Pendientes del avance
 
+## Revisión del APF2 y reportes
+
+Ver `docs/REVISION_CUMPLIMIENTO_APF2.md` para el recuento completo de las 24 operaciones y los requisitos transversales. S4 ya tiene sus cuatro operaciones REST, persistencia propia, integración ESB y portal; faltan la prueba en vivo y la actualización automática durable después de confirmar stock. S1, S2, S3 y S5 conservan diferencias contractuales detalladas en la revisión.
+
+Las confirmaciones y ajustes de S2 ahora requieren MongoDB replica set. No utilizar una instancia standalone como prueba de atomicidad: devuelve 503. Verificar transacciones, fallos durante commit y recuperación antes de dar por cerrada la conformidad del servicio.
+
 Este paquete conserva el estado funcional validado del avance; no incorpora las correcciones de notificaciones que se acordó dejar para después.
 
 ## Notificaciones

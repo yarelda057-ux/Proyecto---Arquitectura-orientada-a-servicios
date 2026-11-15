@@ -26,6 +26,8 @@
 *.tmp
 *.tmp.txt
 *.sqlite
+*.sqlite-wal
+*.sqlite-shm
 *.sqlite3
 *.db
 *.zip

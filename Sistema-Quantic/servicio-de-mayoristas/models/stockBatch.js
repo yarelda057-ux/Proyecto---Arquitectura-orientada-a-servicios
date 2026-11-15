@@ -8,6 +8,7 @@ const stockRowSchema = new Schema({
   cantidad: { type: Number, required: true, min: 0 },
   precioUsd: { type: Number, required: true, min: 0 },
   categoria: { type: String, required: true, maxlength: 160 },
+  categoriaOrigen: { type: String, enum: ['EXPLICITA', 'SECCION', 'DESCRIPCION', 'SIN_CLASIFICAR'] },
 }, { _id: false });
 
 const validationErrorSchema = new Schema({

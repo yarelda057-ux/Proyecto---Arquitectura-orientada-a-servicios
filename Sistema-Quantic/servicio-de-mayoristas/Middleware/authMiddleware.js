@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 import Session from '../models/session.js';
+import Supplier from '../models/supplier.js';
+import { companyByRuc, assertCompany } from '../services/companyRegistry.js';
 import { config } from '../config.js';
 export default async function validateAuth(req, res, next) {
   const token = req.get('authorization')?.replace(/^Bearer /, '');
@@ -14,6 +16,7 @@ export default async function validateAuth(req, res, next) {
       claims = jwt.verify(token, c.integrationKey, { algorithms: ['HS256'], issuer: 'inventory-gateway', audience: 'wholesale-api', maxAge: '60s' });
       // La pasarela solo delega usuarios internos; mayoristas usan sesiones propias.
       if (!['admin', 'user'].includes(claims.role) || !/^[a-f0-9]{24}$/i.test(claims.sub)) throw err;
+      if (claims.purpose === 'analytics-source' && (req.method !== 'GET' || !['/snapshot', '/eventos-stock'].includes(req.path))) return res.status(403).json({ message: 'La credencial analitica solo permite consultar versiones y eventos.' });
       req.user = { _id: claims.sub, role: claims.role, email: claims.email };
       req.session = claims;
       return next();
@@ -24,6 +27,11 @@ export default async function validateAuth(req, res, next) {
     const session = await Session.findOne({ _id: claims.jti, userId: claims.sub, expiresAt: { $gt: new Date() } });
     const user = session && await User.findById(claims.sub).select('-password');
     if (!user || user.isActive === false) return res.status(401).json({ message: 'Sesión inválida.' });
+    if (user.role === 'mayorista') {
+      const supplier = await Supplier.findOne({ supplierId: user.supplierId, activo: true });
+      if (!supplier) return res.status(403).json({ message: 'Empresa inactiva.' });
+      user.company = assertCompany(await companyByRuc(supplier.ruc));
+    }
     req.user = user; req.session = claims; next();
   } catch (err) { next(err); }
 }

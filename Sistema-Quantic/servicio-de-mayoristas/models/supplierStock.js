@@ -9,6 +9,7 @@ const supplierStockSchema = new Schema({
   cantidad: { type: Number, required: true, min: 0 },
   precioUsd: { type: Number, required: true, min: 0 },
   categoria: { type: String, required: true, maxlength: 160, default: 'Sin categoría' },
+  categoriaOrigen: { type: String, enum: ['EXPLICITA', 'SECCION', 'DESCRIPCION', 'SIN_CLASIFICAR'] },
   versionInventario: { type: String, required: true, maxlength: 64 },
   lastBatchId: { type: String, required: true, maxlength: 64 },
   updatedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },

@@ -11,7 +11,7 @@ export function auditMiddleware(sink = enqueueAudit) {
     res.set('X-Request-ID', requestId);
     let sent = false;
     const record = () => {
-      if (sent) return; sent = true;
+      if (sent || req.auditRecorded) return; sent = true;
       if (!['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'].includes(req.method)) return;
       const event = { event_id: randomUUID(), occurred_at: occurredAt, actor_id: req.user?._id?.toString() || req.auditActorId || null,
         method: req.method, path, status_code: res.writableFinished ? res.statusCode : 499,

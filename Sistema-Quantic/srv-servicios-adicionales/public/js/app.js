@@ -354,11 +354,11 @@ async function cargarEmpresas() {
             <div><strong>✉️ Correo:</strong> ${escapeHtml(e.email_contacto)}</div>
             <div><strong>📞 Teléfono / WhatsApp:</strong> ${escapeHtml(e.telefono)}</div>
             ${e.sitio_web ? `
-              <div><strong>🌐 Web:</strong> <a href="${escapeHtml(e.sitio_web)}" target="_blank" style="color: var(--cyan-primary); font-weight: 600;">${escapeHtml(e.sitio_web)} ↗</a></div>
+              <div><strong>🌐 Web:</strong> <a href="${safeWebsite(e.sitio_web)}" target="_blank" rel="noopener noreferrer" style="color: var(--cyan-primary); font-weight: 600;">${escapeHtml(e.sitio_web)} ↗</a></div>
             ` : ''}
           </div>
 
-          <button class="btn-elegant-primary" style="width: 100%; justify-content: center;" onclick="filtrarPorEmpresaEnCatalogo('${escapeHtml(e.razon_social)}')">
+          <button class="btn-elegant-primary" style="width: 100%; justify-content: center;" data-company-name="${escapeHtml(e.razon_social)}" onclick="filtrarPorEmpresaEnCatalogo(this.dataset.companyName)">
             Explorar Sus Servicios en Catálogo →
           </button>
         </div>
@@ -382,7 +382,7 @@ async function cargarSelectEmpresasParaServicio() {
   try {
     const res = await fetch(`${API_BASE}/catalogo/empresas`);
     const data = await res.json();
-    const empresas = data.datos || [];
+    const empresas = (data.datos || []).filter(e => e.ofrece_servicios && (!window.QUANTIC_COMPANY_ID || String(e.id) === String(window.QUANTIC_COMPANY_ID)));
 
     if (empresas.length === 0) {
       select.innerHTML = '<option value="">No hay empresas verificadas disponibles</option>';
@@ -433,6 +433,8 @@ function initForms() {
     }
 
     const payload = {
+        ofrece_servicios: document.getElementById('empOfreceServicios').checked,
+        provee_equipos: document.getElementById('empProveeEquipos').checked,
       razon_social,
       ruc,
       email_contacto,
@@ -597,7 +599,7 @@ async function cargarSolicitudesAdmin() {
             <div><strong>Contacto:</strong> ${escapeHtml(sol.email_contacto)}</div>
             <div><strong>Teléfono:</strong> ${escapeHtml(sol.telefono)}</div>
             <div><strong>Dirección:</strong> ${escapeHtml(sol.direccion || 'No especificada')}</div>
-            <div><strong>Web:</strong> ${sol.sitio_web ? `<a href="${escapeHtml(sol.sitio_web)}" target="_blank" style="color: var(--cyan-primary);">${escapeHtml(sol.sitio_web)}</a>` : 'No registrada'}</div>
+            <div><strong>Web:</strong> ${sol.sitio_web ? `<a href="${safeWebsite(sol.sitio_web)}" target="_blank" rel="noopener noreferrer" style="color: var(--cyan-primary);">${escapeHtml(sol.sitio_web)}</a>` : 'No registrada'}</div>
           </div>
 
           <!-- Servicios vinculados con control individual -->
@@ -730,8 +732,10 @@ async function cambiarEstadoEmpresa(id, nuevoEstado) {
 }
 
 async function cambiarEstadoServicio(id, nuevoEstado) {
+  if (window.QUANTIC_COMPANY_ROLE !== 'admin' && nuevoEstado === 'APROBADO') nuevoEstado = 'PENDIENTE';
+
   try {
-    const res = await fetch(`${API_BASE}/demo-admin/servicios/${id}/estado`, {
+    const res = await fetch(`${API_BASE}/${window.QUANTIC_COMPANY_ROLE === 'admin' ? 'demo-admin' : 'catalogo'}/servicios/${id}/estado`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ estado: nuevoEstado })
@@ -890,7 +894,7 @@ function renderizarPortalEmpresa() {
   
   const webEl = document.getElementById('portalWebText');
   if (emp.sitio_web) {
-    webEl.innerHTML = `<a href="${escapeHtml(emp.sitio_web)}" target="_blank" style="color:var(--cyan-primary); text-decoration:underline;">${escapeHtml(emp.sitio_web)} ↗</a>`;
+    webEl.innerHTML = `<a href="${safeWebsite(emp.sitio_web)}" target="_blank" rel="noopener noreferrer" style="color:var(--cyan-primary); text-decoration:underline;">${escapeHtml(emp.sitio_web)} ↗</a>`;
   } else {
     webEl.textContent = 'Sin sitio web';
   }
@@ -1129,7 +1133,7 @@ async function verDetalleEmpresa(empresaId) {
         ${e.direccion ? `<div><strong>📌 Dirección:</strong> ${escapeHtml(e.direccion)}</div>` : ''}
         <div><strong>✉️ Correo:</strong> <a href="mailto:${escapeHtml(e.email_contacto)}" style="color: var(--cyan-primary); font-weight: 600;">${escapeHtml(e.email_contacto)}</a></div>
         <div><strong>📞 Teléfono:</strong> <a href="tel:${escapeHtml(e.telefono)}" style="color: var(--cyan-primary); font-weight: 600;">${escapeHtml(e.telefono)}</a></div>
-        ${e.sitio_web ? `<div><strong>🌐 Sitio Web:</strong> <a href="${escapeHtml(e.sitio_web)}" target="_blank" style="color: var(--cyan-primary); text-decoration: underline;">${escapeHtml(e.sitio_web)} ↗</a></div>` : ''}
+        ${e.sitio_web ? `<div><strong>🌐 Sitio Web:</strong> <a href="${safeWebsite(e.sitio_web)}" target="_blank" rel="noopener noreferrer" style="color: var(--cyan-primary); text-decoration: underline;">${escapeHtml(e.sitio_web)} ↗</a></div>` : ''}
       </div>
 
       ${e.descripcion ? `
@@ -1202,3 +1206,5 @@ function escapeHtml(text) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+function safeWebsite(value) { try { const url = new URL(value); return ['http:', 'https:'].includes(url.protocol) ? escapeHtml(url.href) : '#'; } catch { return '#'; } }
