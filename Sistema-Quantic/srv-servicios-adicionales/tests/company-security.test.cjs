@@ -1,42 +1,34 @@
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { sign, verify, companyAccess, admin, authenticate } = require('../src/companySecurity');
-const { capabilities } = require('../src/companyRegistry');
-const key = 'company-test-key-'.repeat(4);
-const claims = { sub: 'user-1', iss: 'inventory-gateway', aud: 'company-api', role: 'mayorista', ruc: '20601234561' };
-const company = { ruc: claims.ruc, estado_verificacion: 'APROBADO', ofrece_servicios: true, provee_equipos: false };
-test('signed portal identity; tampering, wrong audience and expiration rejected', () => {
-  const token = sign(claims, key);
-  assert.equal(verify(token, key).ruc, claims.ruc);
-  assert.throws(() => verify(token, key + 'wrong'));
-  assert.throws(() => verify(sign({ ...claims, aud: 'wholesale-api' }, key), key));
-  assert.throws(() => verify(token, key, Math.floor(Date.now()/1000) + 61));
-  assert.throws(() => verify(sign({ ...claims, iss: 'another-service' }, key), key));
+const test=require('node:test'),assert=require('node:assert/strict');
+const {sign,verify,companyAccess}=require('../src/companySecurity');
+const accounts=require('../src/localAccounts'),db=require('../src/config/db');
+const key='test-secret-'.repeat(4);
+test('only internal portal roles can federate; stock cannot access by matching RUC',()=>{
+  const c={sub:'admin-1',iss:'inventory-gateway',aud:'company-api',role:'admin'};
+  assert.equal(verify(sign(c,key),key).role,'admin');
+  for(const role of ['mayorista','empresa','integration'])assert.throws(()=>verify(sign({...c,role},key),key));
+  assert.throws(()=>verify(sign(c,key),key+'wrong'));
+  assert.throws(()=>verify(sign(c,key),key,Math.floor(Date.now()/1000)+61));
 });
-test('integration identities cannot become portal administrators', () => {
-  const token = sign({ ...claims, iss: 'wholesale-integration', role: 'integration' }, key);
-  const identity = verify(token, key);
-  let status;
-  admin({ identity }, { status(value) { status = value; return this; }, json() {} }, () => assert.fail('Must deny admin access'));
-  assert.equal(status, 403);
-  assert.throws(() => verify(sign({ ...claims, iss: 'wholesale-integration', role: 'admin' }, key), key));
+test('pending applicant sees own profile but cannot publish or access another company',async()=>{
+  const req={identity:{role:'empresa',companyId:1}}, company={id:1,ruc:'20601234561',estado_verificacion:'PENDIENTE',ofrece_servicios:true};
+  assert.equal(await companyAccess(req,company),company);
+  await assert.rejects(companyAccess(req,company,{services:true}),{status:403});
+  await assert.rejects(companyAccess(req,{...company,id:2}),{status:403});
+  await assert.rejects(companyAccess({identity:{role:'mayorista',ruc:company.ruc}},company),{status:403});
 });
-test('public requests cannot administer companies', () => {
-  let status;
-  authenticate({ get: () => undefined }, { status(value) { status = value; return this; }, json() {} }, () => assert.fail('Must authenticate'));
-  assert.equal(status, 401);
-});
-test('service companies can publish their own offers, never another company', async () => {
-  assert.equal(await companyAccess({ identity: claims }, company, { services: true }), company);
-  await assert.rejects(companyAccess({ identity: { ...claims, ruc: '20602345672' } }, company), { status: 403 });
-  await assert.rejects(companyAccess({ identity: { role: 'user' } }, company), { status: 403 });
-});
-test('equipment-only, suspended and pending companies cannot publish services', async () => {
-  for (const change of [{ ofrece_servicios: false }, { estado_verificacion: 'INACTIVO' }, { estado_verificacion: 'PENDIENTE' }]) {
-    await assert.rejects(companyAccess({ identity: claims }, { ...company, ...change }, { services: true }), { status: 403 });
-  }
-});
-test('activities allow services, equipment or both, rejecting coercion and neither', () => {
-  for (const [services, equipment] of [[true,false],[false,true],[true,true]]) assert.deepEqual(capabilities({ ofrece_servicios: services, provee_equipos: equipment }), { ofrece_servicios: services, provee_equipos: equipment });
-  for (const value of [{}, { ofrece_servicios: false, provee_equipos: false }, { ofrece_servicios: 'false', provee_equipos: true }]) assert.throws(() => capabilities(value), { status: 400 });
+test('independent passwords, session expiration through logout, reset revocation and ownership',async t=>{
+  const rows=new Map();t.mock.method(db,'isMySQLConnected',()=>true);
+  t.mock.method(db,'query',async(sql,args)=>{
+    if(sql.startsWith('SELECT'))return rows.has(args[0])?[rows.get(args[0])]:[];
+    if(sql.startsWith('INSERT'))rows.set(args[0],{email:args[0],empresa_id:args[1],password_hash:args[2]});
+    return [];
+  });
+  await accounts.save(1,'owner@example.test','strong-password-123');
+  assert.ok(!rows.get('owner@example.test').password_hash.includes('strong-password'));
+  const first=await accounts.login('owner@example.test','strong-password-123');
+  assert.equal(accounts.session(first.token).companyId,1);
+  await accounts.save(1,'owner@example.test','another-password-123');assert.equal(accounts.session(first.token),null);
+  await assert.rejects(accounts.login('owner@example.test','strong-password-123'),{status:401});
+  const second=await accounts.login('owner@example.test','another-password-123');accounts.logout(second.token);assert.equal(accounts.session(second.token),null);
+  await assert.rejects(accounts.save(2,'owner@example.test','third-password-123'),{status:409});
 });

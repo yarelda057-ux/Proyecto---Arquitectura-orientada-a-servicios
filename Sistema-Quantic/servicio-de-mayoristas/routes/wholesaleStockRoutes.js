@@ -12,7 +12,7 @@ import StockBatch from '../models/stockBatch.js';
 import StockVersion from '../models/stockVersion.js';
 import User from '../models/user.js';
 
-import { companyByRuc, assertCompany } from '../services/companyRegistry.js';
+import Session from '../models/session.js';
 import NotificationOutbox from '../models/notificationOutbox.js';
 import { enqueueNotification } from '../services/notificationOutboxWorker.js';
 
@@ -317,12 +317,10 @@ async function applyBatch(batch, actorId) {
 const router = Router();
 async function requireStockCompany(supplierId) {
   const supplier = await getSupplier(supplierId, { activeOnly: true });
-  assertCompany(await companyByRuc(supplier.ruc), true);
   return supplier;
 }
 router.use(validateAuth);
 router.use(async (req, res, next) => {
-  if (req.user.role === 'mayorista') assertCompany(req.user.company, true);
   if (req.user.role === 'mayorista') await getSupplier(req.user.supplierId, { activeOnly: true });
   if (!['GET', 'HEAD'].includes(req.method) && !['admin', 'mayorista'].includes(req.user.role)) return res.status(403).json({ message: 'No tienes permiso para modificar stock de mayoristas.' });
   next();
@@ -331,24 +329,22 @@ router.use(async (req, res, next) => {
 router.get('/proveedores', async (req, res) => {
   const filter = req.user.role === 'mayorista' ? { supplierId: req.user.supplierId } : {};
   let suppliers = await Supplier.find(filter).sort({ nombre: 1 }).lean();
-  if (req.query.stock === '1') {
-    const allowed = await Promise.all(suppliers.map(async supplier => {
-      if (!supplier.activo) return false;
-      try { assertCompany(await companyByRuc(supplier.ruc), true); return true; }
-      catch (err) { if (err.status === 403) return false; throw err; }
-    }));
-    suppliers = suppliers.filter((_supplier, index) => allowed[index]);
-  }
+  if (req.query.stock === '1') suppliers = suppliers.filter(s => s.activo);
   const accounts = req.user.role === 'admin' ? await User.find({ role: 'mayorista', supplierId: { $in: suppliers.map(supplier => supplier.supplierId) }, isActive: { $ne: false } }).select('_id email supplierId').lean() : [];
   res.json({ proveedores: suppliers.map(supplier => ({ ...publicSupplier(supplier), ...(req.user.role === 'admin' ? { accesos: accounts.filter(account => account.supplierId === supplier.supplierId).map(account => ({ id: String(account._id), email: account.email })) } : {}) })) });
 });
 
 router.post('/proveedores', requireAdmin, async (req, res) => {
-  return res.status(410).json({ message: 'Registra la empresa y sus accesos desde Servicios adicionales.' });
+  assertOnly(req.body, ['nombre', 'ruc', 'correoContacto', 'periodoActualizacionDias']);
+  const nombre = text(req.body.nombre, 160), correoContacto = text(req.body.correoContacto, 254)?.toLowerCase();
+  const ruc = text(req.body.ruc, 11), periodo = req.body.periodoActualizacionDias ?? 30;
+  if (!nombre || !isEmail(correoContacto) || !ruc || !/^[0-9]{11}$/.test(ruc) || !Number.isInteger(periodo) || periodo < 1 || periodo > 365) throw error(400, 'Revisa nombre, RUC, correo y periodo (1 a 365 dias).');
+  if (await Supplier.exists({ ruc })) throw error(409, 'El RUC ya esta registrado en Mayoristas.');
+  const supplier = await Supplier.create({ supplierId: 'MAY-' + randomUUID().toUpperCase(), nombre, ruc, correoContacto, periodoActualizacionDias: periodo });
+  res.status(201).json({ proveedor: publicSupplier(supplier) });
 });
 
 router.put('/proveedores/:idMayorista', requireAdmin, async (req, res) => {
-  if (['nombre', 'ruc', 'correoContacto', 'activo'].some(field => field in (req.body || {}))) return res.status(410).json({ message: 'Gestiona los datos y estado de la empresa desde Servicios adicionales.' });
   assertOnly(req.body, ['nombre', 'ruc', 'correoContacto', 'periodoActualizacionDias', 'activo']);
   const updates = {};
   if ('nombre' in req.body) { const value = text(req.body.nombre, 160); if (!value) throw error(400, 'Nombre inválido.'); updates.nombre = value; }
@@ -390,11 +386,24 @@ router.put('/notificaciones/:idMayorista/mensaje', requireAdmin, async (req,res)
 });
 
 router.post('/proveedores/:idMayorista/usuarios', requireAdmin, async (req, res) => {
-  return res.status(410).json({ message: 'Gestiona los accesos desde Servicios adicionales.' });
+  assertOnly(req.body, ['email', 'password']);
+  const supplierId = normalizeSupplierId(req.params.idMayorista);
+  await getSupplier(supplierId, { activeOnly: true });
+  const email = text(req.body.email, 254)?.toLowerCase(), password = req.body.password;
+  if (!isEmail(email) || typeof password !== 'string' || password.length < 15 || Buffer.byteLength(password) > 72) throw error(400, 'Correo valido y contrasena de 15 caracteres como minimo (maximo 72 bytes).');
+  const user = await User.create({ email, password, role: 'mayorista', supplierId });
+  res.status(201).json({ usuario: { id: String(user._id), email: user.email, supplierId } });
 });
 
 router.put('/proveedores/:idMayorista/usuarios/:idUsuario/password', requireAdmin, async (req, res) => {
-  return res.status(410).json({ message: 'Gestiona las contrasenas desde Servicios adicionales.' });
+  assertOnly(req.body, ['password']);
+  const supplierId = normalizeSupplierId(req.params.idMayorista), password = req.body.password;
+  if (!mongoose.isValidObjectId(req.params.idUsuario) || typeof password !== 'string' || password.length < 15 || Buffer.byteLength(password) > 72) throw error(400, 'Identificador o contrasena invalida.');
+  const user = await User.findOne({ _id: req.params.idUsuario, supplierId, role: 'mayorista' });
+  if (!user) throw error(404, 'Acceso no encontrado.');
+  user.password = password; await user.save();
+  await Session.deleteMany({ userId: user._id });
+  res.json({ message: 'Contrasena actualizada y sesiones anteriores cerradas.' });
 });
 
 router.post('/upload', async (req, res) => {
@@ -523,6 +532,17 @@ router.get('/eventos-stock', requireAdmin, async (req, res) => {
   if (!Number.isSafeInteger(after) || after < 0) throw error(400, 'Secuencia invalida.');
   const items = await StockSnapshot.find({ sequence: { $gt: after } }).sort({ sequence: 1 }).limit(25).select('-chunks -total').lean();
   res.set('Cache-Control', 'no-store').json({ eventos: items.map(item => ({ versionInventario: item._id, secuencia: item.sequence, actorId: item.actorId, idLote: item.batchId, idOperacion: item.operationId, actualizadoEn: item.actualizadoEn })) });
+});
+
+router.get('/versiones', requireAdmin, async (req, res) => {
+  assertOnly(req.query, ['desde', 'hasta']);
+  const valid = d => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d) && Number.isFinite(Date.parse(d)) && new Date(d).toISOString().slice(0, 10) === d;
+  if (!valid(req.query.desde) || !valid(req.query.hasta) || req.query.desde > req.query.hasta) throw error(400, 'Rango de fechas invalido.');
+  const from = new Date(req.query.desde + 'T00:00:00-05:00');
+  const end = new Date(new Date(req.query.hasta + 'T00:00:00-05:00').getTime() + 86400000);
+  const [inicio, cierre] = await Promise.all([StockSnapshot.findOne({ actualizadoEn: { $lt: from } }).sort({ sequence: -1 }).lean(), StockSnapshot.findOne({ actualizadoEn: { $lt: end } }).sort({ sequence: -1 }).lean()]);
+  const meta = row => row ? { versionInventario: row._id, actualizadoEn: row.actualizadoEn } : null;
+  res.set('Cache-Control', 'no-store').json({ inicio: meta(inicio), cierre: meta(cierre), zonaHoraria: 'America/Lima' });
 });
 
 router.get('/snapshot', async (req, res) => {

@@ -28,10 +28,14 @@ app.get('/js/company-config.js', (_req, res) => {
   const origins = (process.env.PORTAL_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173').split(',').map(x => x.trim()).filter(Boolean);
   res.type('js').send('window.COMPANY_PORTAL_ORIGINS=' + JSON.stringify(origins) + ';');
 });
-app.use('/api/v1/integracion', require('./routes/companyIntegrationRoutes'));
+app.use('/api/v1', (req, res, next) => {
+  if (!['GET', 'HEAD'].includes(req.method) && !db.isMySQLConnected()) return res.status(503).json({ mensaje: 'No se pueden guardar cambios temporalmente. Intenta mas tarde.' });
+  next();
+});
+app.use('/api/v1/cuentas', require('./routes/accountRoutes'));
 app.get('/api/v1/mi-empresa', authenticate, asyncRoute(async (req, res) => {
-  if (req.identity.role !== 'mayorista') return res.json({ datos: null, role: req.identity.role });
-  res.json({ datos: await companyAccess(req, await Empresa.getByRuc(req.identity.ruc)), role: req.identity.role });
+  if (req.identity.role !== 'empresa') return res.json({ datos: null, role: req.identity.role });
+  res.json({ datos: await companyAccess(req, await Empresa.getById(req.identity.companyId)), role: req.identity.role });
 }));
 app.get('/api/v1/catalogo/empresas/perfil/ruc/:ruc', authenticate, asyncRoute(async (req, _res, next) => {
   await companyAccess(req, await Empresa.getByRuc(req.params.ruc)); next();

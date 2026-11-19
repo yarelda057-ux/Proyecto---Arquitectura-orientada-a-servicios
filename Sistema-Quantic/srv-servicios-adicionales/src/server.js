@@ -19,6 +19,7 @@ async function iniciarServidor() {
   // Verificar disponibilidad de MySQL
   await db.checkDatabaseConnection();
   await require('./companyRegistry').migrate();
+  await require('./localAccounts').migrate();
 
   app.listen(PORT, () => {
     console.log(`\n Servidor ejecutándose en el puerto: ${PORT}`);

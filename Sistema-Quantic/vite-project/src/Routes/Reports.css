@@ -50,3 +50,7 @@
 .reports-table h2 { font-size: 1.25rem; }
 @media (max-width: 780px) { .reports-charts, .reports-fields { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { .reports-fields { grid-template-columns: 1fr; } .reports-result-heading { align-items: flex-start; flex-direction: column; } .reports-page { padding: 24px 14px; } }
+
+.reports-export { background: #fff; border: 1px solid #dce5ed; border-top: 4px solid #087f8c; border-radius: 18px; padding: 28px; margin: 32px 0; box-shadow: 0 10px 30px #112e4610; }
+.reports-export .reports-fields { margin: 20px 0; gap: 18px; }
+.reports-export .reports-fields small { display: block; color: #526579; margin-top: 6px; }

@@ -1,3 +1,5 @@
+import { buildReport, reportInput } from './exportReport.js';
+import { reportAttachment } from './reportFiles.js';
 import { randomUUID } from 'node:crypto';
 import { createApiDocs } from '../apiDocs.cjs';
 import { authenticate } from './auth.js';
@@ -49,6 +51,14 @@ export function createHandler({ clients, repository, source }) {
         const data = await snapshot();
         return send(200, { ...dashboardResult(config, data), configuracion: { nombre: config.nombre, indicadores: config.indicadores, filtros: config.filtros }, historico: false });
       }
+      if (req.method === 'GET' && /^\/reportes\/[A-Za-z0-9_-]{1,100}$/.test(path) && query.formato) {
+        object(query, ['formato']);
+        if (!['PDF', 'EXCEL'].includes(query.formato)) throw fail(400, 'Formato invalido.');
+        const saved = repository.getReport(identity.clientId, path.split('/')[2]);
+        if (!saved?.valores) throw fail(404, 'Reporte exportable no encontrado.');
+        const report = { ...saved, formato: query.formato };
+        return send(200, { ...report, historico: true, ...reportAttachment(report) });
+      }
       if (url.search) throw fail(400, 'La operación no admite parámetros de consulta.');
       if (req.method === 'POST' && path === '/actualizaciones') {
         object(body, ['idOperacion', 'versionInventario']);
@@ -77,6 +87,13 @@ export function createHandler({ clients, repository, source }) {
           return receipt;
         });
         return send(200, result);
+      }
+      if (req.method === 'POST' && path === '/reportes' && body.tipo !== 'stockActual') {
+        const input = reportInput(body);
+        const report = await buildReport(input, source, { token: req.headers['x-stock-authorization'], correlationId });
+        const attachment = reportAttachment(report);
+        repository.saveReport(identity.clientId, report.idReporte, report);
+        return send(201, { ...report, ...attachment });
       }
       if (req.method === 'POST' && path === '/reportes') {
         object(body, ['tipo', 'formato', 'filtros', 'versionInventario']);

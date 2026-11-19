@@ -16,7 +16,7 @@ app.use((req,res,next)=>{ const correlationId = req.get('X-Correlation-ID')?.sli
 app.use('/v1/additional-services', additionalServicesRouter());
 app.use('/v1/stock', stockRouter());
 const reporting = reportsRouter();
-app.use(['/v1/reports', '/v1/inventory-source', '/v1/inventory-events'], (req, res, next) => {
+app.use(['/v1/reports', '/v1/inventory-source', '/v1/inventory-events', '/v1/inventory-versions'], (req, res, next) => {
   req.url = req.baseUrl.slice('/v1'.length) + req.url;
   return reporting(req, res, next);
 });

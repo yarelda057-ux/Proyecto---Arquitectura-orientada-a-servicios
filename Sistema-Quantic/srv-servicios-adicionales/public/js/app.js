@@ -1,3 +1,4 @@
+function companyName(value) { return String(value || '').replace(/\s*\[DEMO[^\]]*\]/gi, ''); }
 // =============================================================================
 // LÓGICA FRONTEND - DIRECTORIO COMERCIAL
 // Quantic Technology S.A.C. - Directorio de Servicios Adicionales
@@ -30,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initForms();
   initAdminPanel();
   initPortalEmpresa();
-  checkHealthAndDB();
 
   // Cargar datos iniciales
   cargarCatalogoServicios();
@@ -52,6 +52,7 @@ function initNavigation() {
 }
 
 function switchTab(tabId) {
+  if (tabId === 'panel-admin-demo' && window.QUANTIC_COMPANY_ROLE !== 'admin') return;
   state.currentTab = tabId;
 
   // Actualizar botones de navegación
@@ -88,28 +89,7 @@ function switchTab(tabId) {
 // =============================================================================
 // 2. DIAGNÓSTICO Y CONEXIÓN DE BASE DE DATOS
 // =============================================================================
-async function checkHealthAndDB() {
-  const badge = document.getElementById('dbStatusBadge');
-  const text = document.getElementById('dbStatusText');
 
-  try {
-    const res = await fetch(`${API_BASE}/salud`);
-    const data = await res.json();
-
-    if (data.base_de_datos && data.base_de_datos.estado === 'CONECTADO') {
-      badge.classList.add('connected');
-      text.textContent = 'MySQL Conectado';
-      badge.title = 'Persistencia activa en MySQL (quantic_servicios_db)';
-    } else {
-      badge.classList.remove('connected');
-      text.textContent = 'Modo Demo (Memoria)';
-      badge.title = 'Ejecutando en memoria local. Configura tu contraseña en .env cuando estés listo.';
-    }
-  } catch (err) {
-    badge.classList.remove('connected');
-    text.textContent = 'Servidor Local';
-  }
-}
 
 // =============================================================================
 // 3. CÁPSULA DE BÚSQUEDA Y FILTRADO
@@ -252,17 +232,15 @@ function renderizarServicios(servicios) {
         <div>
           <div class="card-top-bar">
             <span class="card-tag ${tagClass}">${escapeHtml(s.categoria)}</span>
-            <div class="card-rating-pill">
-              <span>★</span> 4.9 <small style="opacity: 0.7;">(Habido SUNAT)</small>
-            </div>
+            
           </div>
 
           <h3 class="card-service-title">${escapeHtml(s.nombre)}</h3>
           <p class="card-service-desc">${escapeHtml(s.descripcion)}</p>
 
           <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.8rem;">
-            <span class="peru-badge">🇵🇪 RUC Activo</span>
-            <span class="peru-badge">🧾 Factura Electrónica</span>
+            
+            
           </div>
         </div>
 
@@ -273,7 +251,7 @@ function renderizarServicios(servicios) {
             <div class="company-main">
               <div class="company-avatar">🏢</div>
               <div>
-                <span class="company-name">${escapeHtml(s.empresa_razon_social)}</span>
+                <span class="company-name">${escapeHtml(companyName(s.empresa_razon_social))}</span>
               </div>
             </div>
             <span class="city-pill">📍 ${escapeHtml(s.empresa_ciudad || 'Perú')}</span>
@@ -334,15 +312,15 @@ async function cargarEmpresas() {
         <div>
           <div class="card-top-bar">
             <span class="card-tag tag-soporte">RUC: ${escapeHtml(e.ruc)}</span>
-            <span class="status-pill-badge" style="background: #dcfce7; color: #166534;">HABIDO &bull; ACTIVO ✓</span>
+            
           </div>
 
-          <h3 class="card-service-title">${escapeHtml(e.razon_social)}</h3>
+          <h3 class="card-service-title">${escapeHtml(companyName(e.razon_social))}</h3>
           <p class="card-service-desc">${escapeHtml(e.descripcion || 'Proveedor tecnológico autorizado en Quantic Technology.')}</p>
 
           <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.8rem;">
-            <span class="peru-badge">🇵🇪 RUC Verificado</span>
-            <span class="peru-badge">🧾 Emite Factura Electrónica</span>
+            
+            
           </div>
         </div>
 
@@ -358,7 +336,7 @@ async function cargarEmpresas() {
             ` : ''}
           </div>
 
-          <button class="btn-elegant-primary" style="width: 100%; justify-content: center;" data-company-name="${escapeHtml(e.razon_social)}" onclick="filtrarPorEmpresaEnCatalogo(this.dataset.companyName)">
+          <button class="btn-elegant-primary" style="width: 100%; justify-content: center;" data-company-name="${escapeHtml(companyName(e.razon_social))}" onclick="filtrarPorEmpresaEnCatalogo(this.dataset.companyName)">
             Explorar Sus Servicios en Catálogo →
           </button>
         </div>
@@ -390,7 +368,7 @@ async function cargarSelectEmpresasParaServicio() {
     }
 
     select.innerHTML = '<option value="">-- Seleccione una empresa verificada --</option>' +
-      empresas.map(e => `<option value="${e.id}">${escapeHtml(e.razon_social)} (${escapeHtml(e.ciudad)}) - RUC: ${e.ruc}</option>`).join('');
+      empresas.map(e => `<option value="${e.id}">${escapeHtml(companyName(e.razon_social))} (${escapeHtml(e.ciudad)}) - RUC: ${e.ruc}</option>`).join('');
   } catch (err) {
     select.innerHTML = '<option value="">Error al cargar empresas</option>';
   }
@@ -433,8 +411,9 @@ function initForms() {
     }
 
     const payload = {
-        ofrece_servicios: document.getElementById('empOfreceServicios').checked,
-        provee_equipos: document.getElementById('empProveeEquipos').checked,
+        region: document.getElementById('empRegion').value.trim(), sede: document.getElementById('empSede').value.trim(),
+        ofrece_servicios: true,
+        provee_equipos: false,
       razon_social,
       ruc,
       email_contacto,
@@ -587,7 +566,7 @@ async function cargarSolicitudesAdmin() {
         <div class="solicitud-box">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.9rem; flex-wrap: wrap; gap: 0.8rem;">
             <div>
-              <h3 style="font-family: var(--font-heading); font-size: 1.28rem; color: var(--navy-title);">${escapeHtml(sol.razon_social)}</h3>
+              <h3 style="font-family: var(--font-heading); font-size: 1.28rem; color: var(--navy-title);">${escapeHtml(companyName(sol.razon_social))}</h3>
               <div style="font-size: 0.82rem; color: var(--navy-muted); margin-top: 0.2rem;">
                 RUC: <strong>${escapeHtml(sol.ruc)}</strong> &bull; Sede: <strong>${escapeHtml(sol.ciudad)}</strong> &bull; Fecha: ${new Date(sol.created_at).toLocaleString('es-PE')}
               </div>
@@ -643,13 +622,13 @@ async function cargarSolicitudesAdmin() {
                     ` : ''}
 
                     ${srvInactivo ? `
-                      <button class="btn-srv-toggle btn-srv-enable" onclick="cambiarEstadoServicio(${s.id}, 'APROBADO')" title="Habilitar este servicio para publicarlo">
+                      <button class="btn-srv-toggle btn-srv-enable" onclick="cambiarEstadoServicio(${s.id}, 'PENDIENTE')" title="Habilitar este servicio para publicarlo">
                         ▶ Habilitar
                       </button>
                     ` : ''}
 
                     ${srvPendiente ? `
-                      <button class="btn-srv-toggle btn-srv-enable" onclick="cambiarEstadoServicio(${s.id}, 'APROBADO')">
+                      <button class="btn-srv-toggle btn-srv-enable" onclick="cambiarEstadoServicio(${s.id}, 'PENDIENTE')">
                         ✓ Aprobar
                       </button>
                       <button class="btn-srv-toggle btn-srv-reject" onclick="cambiarEstadoServicio(${s.id}, 'RECHAZADO')">
@@ -838,7 +817,7 @@ async function cargarPortalEmpresaChips() {
 
     container.innerHTML = emps.map(emp => `
       <button type="button" class="admin-pill-btn" onclick="ingresarAlPortal('${escapeHtml(emp.ruc)}')">
-        🏢 ${escapeHtml(emp.razon_social)} (${escapeHtml(emp.ruc)})
+        🏢 ${escapeHtml(companyName(emp.razon_social))} (${escapeHtml(emp.ruc)})
       </button>
     `).join('');
   } catch (err) {
@@ -885,7 +864,7 @@ function renderizarPortalEmpresa() {
   const emp = state.empresaAutenticada;
   if (!emp) return;
 
-  document.getElementById('portalNombreEmpresa').textContent = emp.razon_social;
+  document.getElementById('portalNombreEmpresa').textContent = companyName(emp.razon_social);
   document.getElementById('portalRucText').textContent = emp.ruc;
   document.getElementById('portalCiudadText').textContent = emp.ciudad;
   document.getElementById('portalTelefonoText').textContent = emp.telefono;
@@ -986,7 +965,7 @@ function renderizarPortalEmpresa() {
           ` : ''}
 
           ${isInactivo ? `
-            <button class="btn-card-ghost" onclick="cambiarEstadoServicio(${s.id}, 'APROBADO')" title="Reactivar y mostrar en el catálogo" style="color:#10b981; border-color:#10b981; padding:0.6rem;">
+            <button class="btn-card-ghost" onclick="cambiarEstadoServicio(${s.id}, 'PENDIENTE')" title="Reactivar y mostrar en el catálogo" style="color:#10b981; border-color:#10b981; padding:0.6rem;">
               ▶ Reactivar
             </button>
           ` : ''}
@@ -1001,6 +980,8 @@ function abrirModalEditarEmpresa() {
   if (!emp) return;
 
   document.getElementById('editEmpresaId').value = emp.id;
+  document.getElementById('editEmpRegion').value = emp.region || '';
+  document.getElementById('editEmpSede').value = emp.sede || '';
   document.getElementById('modalEditEmpresaTitulo').textContent = `Editar: ${emp.razon_social}`;
   document.getElementById('editEmpTelefono').value = emp.telefono || '';
   document.getElementById('editEmpCiudad').value = emp.ciudad || 'Lima';
@@ -1021,6 +1002,7 @@ async function guardarCambiosEmpresa(e) {
   if (!empId) return;
 
   const payload = {
+    region: document.getElementById('editEmpRegion').value.trim(), sede: document.getElementById('editEmpSede').value.trim(),
     telefono: document.getElementById('editEmpTelefono').value.trim(),
     ciudad: document.getElementById('editEmpCiudad').value,
     direccion: document.getElementById('editEmpDireccion').value.trim(),
@@ -1123,12 +1105,12 @@ async function verDetalleEmpresa(empresaId) {
     const data = await res.json();
     const e = data.datos;
 
-    document.getElementById('modalEmpresaNombre').textContent = e.razon_social;
+    document.getElementById('modalEmpresaNombre').textContent = companyName(e.razon_social);
     const body = document.getElementById('modalEmpresaBody');
 
     body.innerHTML = `
       <div style="display: grid; gap: 0.6rem; font-size: 0.92rem; background: var(--silver-soft); padding: 1.2rem; border-radius: 16px;">
-        <div><strong>📋 RUC Oficial:</strong> ${escapeHtml(e.ruc)}</div>
+        <div><strong>📋 RUC:</strong> ${escapeHtml(e.ruc)}</div>
         <div><strong>📍 Ciudad:</strong> ${escapeHtml(e.ciudad)}</div>
         ${e.direccion ? `<div><strong>📌 Dirección:</strong> ${escapeHtml(e.direccion)}</div>` : ''}
         <div><strong>✉️ Correo:</strong> <a href="mailto:${escapeHtml(e.email_contacto)}" style="color: var(--cyan-primary); font-weight: 600;">${escapeHtml(e.email_contacto)}</a></div>

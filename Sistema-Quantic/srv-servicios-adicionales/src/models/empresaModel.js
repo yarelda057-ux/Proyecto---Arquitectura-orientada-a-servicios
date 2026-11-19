@@ -89,11 +89,11 @@ let nextEmpresaId = 6;
 
 class EmpresaModel {
   // Crear una nueva empresa (Siempre nace con estado 'PENDIENTE')
-  static async create({ razon_social, ruc, email_contacto, telefono, sitio_web, direccion, ciudad, descripcion, ofrece_servicios = true, provee_equipos = false }) {
+  static async create({ razon_social, ruc, email_contacto, telefono, sitio_web, direccion, ciudad, descripcion, region, sede, ofrece_servicios = true, provee_equipos = false }) {
     if (db.isMySQLConnected()) {
       const sql = `
-        INSERT INTO empresas (razon_social, ruc, email_contacto, telefono, sitio_web, direccion, ciudad, descripcion, ofrece_servicios, provee_equipos, estado_verificacion)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDIENTE')
+        INSERT INTO empresas (razon_social, ruc, email_contacto, telefono, sitio_web, direccion, ciudad, descripcion, region, sede, ofrece_servicios, provee_equipos, estado_verificacion)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDIENTE')
       `;
       const result = await db.query(sql, [
         razon_social,
@@ -103,7 +103,7 @@ class EmpresaModel {
         sitio_web || null,
         direccion || null,
         ciudad || 'Lima',
-        descripcion || null, ofrece_servicios, provee_equipos
+        descripcion || null, region || null, sede || null, ofrece_servicios, provee_equipos
       ]);
       return {
         id: result.insertId,
@@ -112,7 +112,7 @@ class EmpresaModel {
         ruc,
         email_contacto,
         telefono,
-        sitio_web,
+        sitio_web, region, sede,
         direccion,
         ciudad: ciudad || 'Lima',
         descripcion,
@@ -128,6 +128,7 @@ class EmpresaModel {
       ruc,
       email_contacto,
       telefono,
+      region, sede,
       sitio_web: sitio_web || null,
       direccion: direccion || null,
       ciudad: ciudad || 'Lima',
@@ -246,17 +247,17 @@ class EmpresaModel {
   }
 
   // Actualizar datos comerciales de la empresa (para autogestión de la empresa)
-  static async updateDatos(id, { telefono, direccion, ciudad, sitio_web, descripcion }) {
+  static async updateDatos(id, { telefono, direccion, ciudad, sitio_web, descripcion, region, sede }) {
     if (db.isMySQLConnected()) {
       await db.query(
         `UPDATE empresas 
-         SET telefono = COALESCE(?, telefono),
+         SET region = COALESCE(?, region), sede = COALESCE(?, sede), telefono = COALESCE(?, telefono),
              direccion = COALESCE(?, direccion),
              ciudad = COALESCE(?, ciudad),
              sitio_web = COALESCE(?, sitio_web),
              descripcion = COALESCE(?, descripcion)
          WHERE id = ?`,
-        [telefono || null, direccion || null, ciudad || null, sitio_web || null, descripcion || null, id]
+        [region ?? null, sede ?? null, telefono || null, direccion || null, ciudad || null, sitio_web || null, descripcion || null, id]
       );
       return this.getById(id);
     }
@@ -264,6 +265,8 @@ class EmpresaModel {
     const index = memoriaEmpresas.findIndex(e => e.id === parseInt(id, 10));
     if (index === -1) return null;
 
+    if (region !== undefined) memoriaEmpresas[index].region = region;
+    if (sede !== undefined) memoriaEmpresas[index].sede = sede;
     if (telefono !== undefined) memoriaEmpresas[index].telefono = telefono;
     if (direccion !== undefined) memoriaEmpresas[index].direccion = direccion;
     if (ciudad !== undefined) memoriaEmpresas[index].ciudad = ciudad;

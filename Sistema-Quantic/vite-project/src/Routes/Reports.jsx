@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../services/http';
 import './Reports.css';
+import ReportExport from '../Components/ReportExport';
 
 const labels = { totalProductos: 'Productos registrados', productosConStock: 'Con stock', productosSinStock: 'Sin stock', unidadesDisponibles: 'Unidades disponibles' };
 const number = new Intl.NumberFormat('es-PE');
@@ -64,15 +65,6 @@ export default function Reports() {
       initialized.current = true; setResult(data); setDirty(false); setNotice('Configuración guardada. El dashboard se actualiza con las nuevas cargas confirmadas.');
     } catch (err) { setError(err.message); setResult(null); } finally { setBusy(false); }
   }
-  async function download() {
-    setBusy(true); setError(''); setNotice('');
-    try {
-      const report = await api('/v1/inventario/reportes', { method: 'POST', body: { tipo: 'stockActual', formato: 'JSON', filtros: result.filtros, versionInventario: result.versionInventario } });
-      const url = URL.createObjectURL(new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' }));
-      const link = document.createElement('a'); link.href = url; link.download = report.idReporte + '.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-      setNotice('Reporte JSON generado con la versión consultada. Su registro de auditoría está en cola.');
-    } catch (err) { setError(err.message); setResult(null); } finally { setBusy(false); }
-  }
   async function retry(version) {
     setBusy(true); setNotice('');
     try { const response = await api('/v1/inventario/procesos/' + encodeURIComponent(version) + '/reintentar', { method: 'POST' }); setNotice(response.message); }
@@ -95,7 +87,7 @@ export default function Reports() {
     {error && <div className="alert alert-danger" role="alert">{error}</div>}{notice && <div className="alert alert-success" role="status">{notice}</div>}
     {!result && !error && <div className="reports-empty" role="status">Consultando inventario confirmado…</div>}
     {result && <section aria-label="Resultados del dashboard">
-      <div className="reports-result-heading"><div><h2>{result.nombre}</h2><p>Versión {result.versionInventario} · Datos: {date(result.actualizadoEn)}<br />Consultado: {date(result.generadoEn)} (hora de Perú)</p></div><button className="btn btn-outline-primary" onClick={download} disabled={busy || dirty}>Descargar reporte JSON</button></div>
+      <div className="reports-result-heading"><div><h2>{result.nombre}</h2><p>Versión {result.versionInventario} · Datos: {date(result.actualizadoEn)}<br />Consultado: {date(result.generadoEn)} (hora de Perú)</p></div><a className="btn btn-outline-primary" href="#export-title">Preparar descarga</a></div>
       {result.sinRegistros && <p className="alert alert-info mt-3">No hay productos que coincidan con los filtros seleccionados.</p>}
       <div className="reports-kpis">{Object.entries(result.indicadores).map(([key, value]) => <article key={key} className={key === 'productosSinStock' ? 'reports-kpi-warning' : ''}><span>{labels[key]}</span><strong>{number.format(value)}</strong></article>)}</div>
       {!result.sinRegistros && <div className="reports-charts">
@@ -106,6 +98,7 @@ export default function Reports() {
       <div className="reports-table"><h3>Detalle por categoría</h3><table className="table"><caption>Un registro de producto por mayorista. Estos datos reflejan stock disponible, no ventas.</caption><thead><tr><th scope="col">Categoría</th><th scope="col">Productos</th><th scope="col">Con stock</th><th scope="col">Sin stock</th><th scope="col">Unidades</th></tr></thead><tbody>{result.grupos.map(group => <tr key={group.categoria}><th scope="row">{group.categoria}</th><td>{number.format(group.totalProductos)}</td><td>{number.format(group.productosConStock)}</td><td>{number.format(group.productosSinStock)}</td><td>{number.format(group.unidadesEnStock)}</td></tr>)}</tbody></table></div>
       {result.clasificacion && <div className="reports-classification"><h3>Clasificación del inventario</h3><p>{number.format(result.clasificacion.explicita)} con categoría indicada · {number.format(result.clasificacion.seccion)} por sección del Excel · {number.format(result.clasificacion.descripcion)} por descripción · {number.format(result.clasificacion.sinClasificar)} sin clasificar.</p><small>Se respeta la categoría indicada en el archivo. La detección automática usa reglas locales; si no encuentra una coincidencia clara, conserva «Sin categoría».</small></div>}
     </section>}
+    <ReportExport catalog={result?.catalogo} />
     <section className="reports-table"><h2>Actualizaciones automáticas</h2><p>Al confirmar una carga se actualizan los dashboards y se registra la auditoría. Los reintentos recuperan las etapas pendientes sin repetir la carga.</p>
       {processError && <p className="alert alert-warning" role="alert">{processError}</p>}
       {processes && <><p>{processes.pendientes ? processes.pendientes + ' procesos con etapas pendientes.' : 'Sin etapas pendientes en los procesos registrados.'}</p>{!processes.procesos.length ? <p className="text-secondary">Las próximas cargas confirmadas aparecerán aquí.</p> : <table className="table"><thead><tr><th>Versión</th><th>Dashboard</th><th>Auditoría</th><th>Estado</th></tr></thead><tbody>{processes.procesos.map(job => <tr key={job.versionInventario}><td>{job.versionInventario}</td><td>{job.dashboard}</td><td>{job.auditoria}</td><td>{job.estado === 'COMPLETO' ? 'Completado' : 'Stock confirmado; etapas pendientes'}{job.requiereReintento && <button className="btn btn-sm btn-outline-primary ms-2" disabled={busy} onClick={() => retry(job.versionInventario)}>Reintentar pendientes</button>}</td></tr>)}</tbody></table>}</>}

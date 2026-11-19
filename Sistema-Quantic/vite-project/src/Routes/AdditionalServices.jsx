@@ -25,11 +25,10 @@ export default function AdditionalServices() {
   const { user } = useContext(SfpContext);
   const [attempt, setAttempt] = useState(0);
   const [status, setStatus] = useState('loading');
-  const [persistent, setPersistent] = useState(true);
   const [sessionError, setSessionError] = useState('');
 
   useEffect(() => {
-    if (status !== 'ready' || !portalUrl) return;
+    if (status !== 'ready' || !portalUrl || user?.role !== 'admin') return;
     const origin = new URL(portalUrl).origin;
     let active = true, busy = false;
     async function sendSession() {
@@ -50,7 +49,7 @@ export default function AdditionalServices() {
     void sendSession();
     const timer = setInterval(sendSession, 30000);
     return () => { active = false; clearInterval(timer); window.removeEventListener('message', receive); };
-  }, [status, attempt, navigate, user?.canUploadStock]);
+  }, [status, attempt, navigate, user?.canUploadStock, user?.role]);
 
   useEffect(() => {
     if (!portalUrl) return;
@@ -66,7 +65,6 @@ export default function AdditionalServices() {
         const data = await response.json();
         if (data.identificador !== 'SRV-G5202605') throw new Error('Unexpected service');
         if (active) {
-          setPersistent(data.base_de_datos?.estado === 'CONECTADO');
           setStatus('ready');
         }
       } catch {
@@ -96,13 +94,12 @@ export default function AdditionalServices() {
         <button className="btn btn-outline-dark btn-sm" onClick={reload}>Reintentar</button>
       </div>
       : <>
-        {!persistent && <div className="alert alert-warning" role="status">El portal está en modo de demostración: los cambios no se guardarán en MySQL.</div>}
         <iframe
           ref={frame}
           key={attempt}
           className="additional-portal-frame"
           src={portalUrl}
-          title="Directorio comercial: catálogo, proveedores, registro, portal de empresa y panel de demostración"
+          title="Directorio comercial: catálogo, proveedores, registro, portal de empresa y administración"
           referrerPolicy="no-referrer"
           sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox"
         />

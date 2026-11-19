@@ -197,18 +197,6 @@
         "summary": "Administrador: registra proveedor",
         "parameters": [],
         "responses": {
-          "410": {
-            "description": "Operación retirada",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
           "401": {
             "description": "Sin autenticación",
             "content": {
@@ -232,14 +220,51 @@
                 }
               }
             }
+          },
+          "201": {
+            "description": "Datos guardados en Mayoristas"
           }
         },
-        "deprecated": true,
-        "description": "Operación retirada. Usar el servicio de empresas (3002); esta ruta devuelve HTTP 410 a un administrador autenticado.",
+        "description": "Gestion propia de Mayoristas. No consulta Servicios adicionales.",
         "tags": [
           "Stock"
         ],
-        "operationId": "post_api_v1_stock_proveedores"
+        "operationId": "post_api_v1_stock_proveedores",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre": {
+                    "type": "string",
+                    "maxLength": 160
+                  },
+                  "ruc": {
+                    "type": "string",
+                    "pattern": "^[0-9]{11}$"
+                  },
+                  "correoContacto": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "periodoActualizacionDias": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 365
+                  }
+                },
+                "required": [
+                  "nombre",
+                  "ruc",
+                  "correoContacto"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/stock/proveedores/{idMayorista}": {
@@ -332,18 +357,6 @@
           }
         ],
         "responses": {
-          "410": {
-            "description": "Operación retirada",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
           "401": {
             "description": "Sin autenticación",
             "content": {
@@ -367,14 +380,42 @@
                 }
               }
             }
+          },
+          "201": {
+            "description": "Datos guardados en Mayoristas"
           }
         },
-        "deprecated": true,
-        "description": "Operación retirada. Usar el servicio de empresas (3002); esta ruta devuelve HTTP 410 a un administrador autenticado.",
+        "description": "Gestion propia de Mayoristas. No consulta Servicios adicionales.",
         "tags": [
           "Stock"
         ],
-        "operationId": "post_api_v1_stock_proveedores__idMayorista__usuarios"
+        "operationId": "post_api_v1_stock_proveedores__idMayorista__usuarios",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 15,
+                    "maxLength": 72
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/stock/proveedores/{idMayorista}/usuarios/{idUsuario}/password": {
@@ -399,18 +440,6 @@
           }
         ],
         "responses": {
-          "410": {
-            "description": "Operación retirada",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
           "401": {
             "description": "Sin autenticación",
             "content": {
@@ -434,14 +463,37 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Datos guardados en Mayoristas"
           }
         },
-        "deprecated": true,
-        "description": "Operación retirada. Usar el servicio de empresas (3002); esta ruta devuelve HTTP 410 a un administrador autenticado.",
+        "description": "Gestion propia de Mayoristas. No consulta Servicios adicionales.",
         "tags": [
           "Stock"
         ],
-        "operationId": "put_api_v1_stock_proveedores__idMayorista__usuarios__idUsuario__password"
+        "operationId": "put_api_v1_stock_proveedores__idMayorista__usuarios__idUsuario__password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "minLength": 15,
+                    "maxLength": 72
+                  }
+                },
+                "required": [
+                  "password"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/stock/upload": {
@@ -1267,294 +1319,6 @@
         "operationId": "get_api_v1_auth_users"
       }
     },
-    "/api/v1/stock/empresas/{ruc}/vincular": {
-      "post": {
-        "summary": "Vincular empresa y proveedor existente (admin)",
-        "tags": [
-          "Empresas"
-        ],
-        "parameters": [
-          {
-            "name": "ruc",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Operación completada",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Datos inválidos",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Autenticación ausente o vencida",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Permisos insuficientes",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Recurso no encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflicto",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error interno",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Dependencia no disponible",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "idMayorista": {
-                    "type": "string",
-                    "pattern": "^MAY-[A-Z0-9-]{4,58}$"
-                  }
-                },
-                "required": [
-                  "idMayorista"
-                ]
-              }
-            }
-          }
-        },
-        "operationId": "post_api_v1_stock_empresas__ruc__vincular"
-      }
-    },
-    "/api/v1/stock/empresas/{ruc}/acceso": {
-      "post": {
-        "summary": "Crear acceso o cambiar contraseña de empresa (admin)",
-        "tags": [
-          "Empresas"
-        ],
-        "parameters": [
-          {
-            "name": "ruc",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Operación completada",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Datos inválidos",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Autenticación ausente o vencida",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Permisos insuficientes",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Recurso no encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflicto",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error interno",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Dependencia no disponible",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": true
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "password": {
-                    "type": "string",
-                    "format": "password",
-                    "minLength": 15,
-                    "description": "Máximo 72 bytes UTF-8."
-                  },
-                  "accion": {
-                    "type": "string",
-                    "enum": [
-                      "crear",
-                      "password"
-                    ]
-                  }
-                },
-                "additionalProperties": false,
-                "required": [
-                  "email",
-                  "password",
-                  "accion"
-                ]
-              }
-            }
-          }
-        },
-        "operationId": "post_api_v1_stock_empresas__ruc__acceso"
-      }
-    },
     "/api/v1/stock/notificaciones": {
       "get": {
         "summary": "Consultar estado de recordatorios (admin)",
@@ -2358,6 +2122,49 @@
           }
         },
         "operationId": "get_api_v1_stock_lotes__idLote__excel"
+      }
+    },
+    "/api/v1/stock/versiones": {
+      "get": {
+        "operationId": "versionesHistoricas",
+        "summary": "Version previa al inicio y ultima version al cierre; fechas en Peru",
+        "responses": {
+          "200": {
+            "description": "Resultado"
+          },
+          "400": {
+            "description": "Entrada invalida"
+          },
+          "401": {
+            "description": "Sesion requerida"
+          },
+          "403": {
+            "description": "Permisos insuficientes"
+          },
+          "503": {
+            "description": "Servicio no disponible"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "desde",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hasta",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ]
       }
     }
   }

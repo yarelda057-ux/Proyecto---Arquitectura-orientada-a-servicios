@@ -54,16 +54,13 @@
         <button class="nav-btn nav-btn-empresa" data-tab="portal-empresa" title="Acceso privado para empresas proveedoras">
           <span class="btn-icon">💼</span> Portal Empresa
         </button>
-        <button class="nav-btn nav-btn-admin" data-tab="panel-admin-demo">
+        <button class="nav-btn nav-btn-admin" data-tab="panel-admin-demo" hidden>
           <span class="btn-icon">🛡️</span> Gestion de empresas <span class="admin-pill">ADMIN</span>
         </button>
       </nav>
 
       <!-- Estado de la base de datos MySQL -->
-      <div class="db-pill" id="dbStatusBadge" title="Comprobando base de datos MySQL...">
-        <span class="db-dot"></span>
-        <span id="dbStatusText">Verificando BD...</span>
-      </div>
+      
     </div>
   </header>
 
@@ -366,7 +363,7 @@
             </div>
 
             <div class="input-field">
-              <label for="empRuc">RUC (11 dígitos - SUNAT Perú) <span class="required">*</span></label>
+              <label for="empRuc">RUC (11 dígitos) <span class="required">*</span></label>
               <div class="input-box">
                 <span class="input-icon">📋</span>
                 <input type="text" id="empRuc" required maxlength="11" pattern="\d{11}" placeholder="Ej: 20601234567 (Inicia con 10 o 20)">
@@ -392,7 +389,7 @@
             </div>
 
             <div class="input-field">
-              <label for="empCiudad">Región / Ciudad Sede <span class="required">*</span></label>
+              <label for="empCiudad">Ciudad <span class="required">*</span></label>
               <div class="input-box">
                 <span class="input-icon">📍</span>
                 <select id="empCiudad" required>
@@ -649,13 +646,13 @@
         <div class="process-banner" style="background: #eff6ff; border-color: #bfdbfe;">
           <div class="banner-icon-ring" style="background: #dbeafe; color: #1d4ed8;">🔑</div>
           <div class="banner-text" style="color: #1e40af;">
-            <strong>Acceso con cuenta:</strong> La sesion del inventario identifica a tu empresa y verifica sus permisos. Conocer un RUC no concede acceso.
+            <strong>Acceso con cuenta:</strong> Ingresa con tu cuenta de Servicios adicionales. Tus datos se cargan desde tu perfil; el RUC no es una credencial.
           </div>
         </div>
 
         <form id="formAccesoPortal" style="display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: flex-end; max-width: 650px;">
           <div class="input-field">
-            <label for="portalRucInput">Número de RUC Oficial (11 dígitos) <span class="required">*</span></label>
+            <label for="portalRucInput">Número de RUC (11 dígitos) <span class="required">*</span></label>
             <div class="input-box">
               <span class="input-icon">📋</span>
               <input type="text" id="portalRucInput" maxlength="11" pattern="\d{11}" required placeholder="Ej: 20601234561 (TechFix)">
@@ -759,7 +756,7 @@
         </div>
 
         <div class="input-field">
-          <label for="editEmpCiudad">Región / Ciudad Sede <span class="required">*</span></label>
+          <label for="editEmpCiudad">Ciudad <span class="required">*</span></label>
           <div class="input-box">
             <span class="input-icon">📍</span>
             <select id="editEmpCiudad" required>
