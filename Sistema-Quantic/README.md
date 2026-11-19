@@ -12,6 +12,16 @@ Al terminar el arranque, abrir http://localhost:5173. Mantener la ventana abiert
 
 Reportes carga los indicadores al entrar, compara disponibilidad y existencias por categoría y mayorista, y muestra los trabajos pendientes. La categoría del Excel es opcional: se detecta por sección o descripción. La actualización posterior a cada carga es durable, con reintentos y auditoría. Consulta [la revisión de S4 del 15/11](docs/REPORTES_DASHBOARDS_2026-11-15.md) para alcance, pruebas y límites. Reinicia con `INICIAR-QUANTIC.bat` para activar los nuevos procesos.
 
+## Documentación Swagger
+
+Las APIs REST publican Swagger UI en `/docs` y su contrato en `/openapi.json`.
+Puertos locales: inventario **3000**, mayoristas **3001**, servicios adicionales
+**3002**, auditoría **8001**, ESB **8003** y reportes **8004**. Reiniciar los
+procesos para cargar las rutas. La interfaz Swagger necesita acceso a internet
+para sus recursos visuales. Consultar [docs/SWAGGER.md](docs/SWAGGER.md) para
+autenticación, pruebas y configuración de producción. Notificaciones conserva
+su WSDL en `http://localhost:8002/soap/notifications?wsdl`.
+
 ## Componentes
 
 | Carpeta | Función | Puerto local | Persistencia |

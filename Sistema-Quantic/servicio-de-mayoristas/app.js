@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { createApiDocs } from './apiDocs.cjs';
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
@@ -6,12 +6,13 @@ import { securityHeaders } from './Middleware/security.js';
 import authRoutes from './routes/authRoutes.js';
 import stockRoutes from './routes/wholesaleStockRoutes.js';
 import companyRoutes from './routes/companyRoutes.js';
+const apiDocs = createApiDocs({ specPath: new URL('./openapi.json', import.meta.url), title: 'Gestión de Stock de Mayoristas' });
 export function createApp() {
   const app = express();
   app.disable('x-powered-by');
   app.use(securityHeaders);
   app.use(cors({ origin: (process.env.CLIENT_ORIGINS || '').split(',').filter(Boolean) }));
-  app.get('/openapi.json', (req, res) => res.json(JSON.parse(readFileSync(new URL('./openapi.json', import.meta.url), 'utf8'))));
+  app.use((req, res, next) => { if (!apiDocs(req, res)) next(); });
   app.get('/health/live', (req, res) => res.json({ status: 'ok' }));
   app.get('/health/ready', (req, res) => res.status(mongoose.connection.readyState === 1 ? 200 : 503).json({ ready: mongoose.connection.readyState === 1 }));
   app.use('/api/v1/auth', express.json({ limit: '16kb' }), authRoutes);

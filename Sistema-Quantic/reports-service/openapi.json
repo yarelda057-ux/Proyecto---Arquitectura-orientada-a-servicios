@@ -3,12 +3,12 @@
   "info": {
     "title": "Servicio de Reportes y Dashboards de Inventario",
     "version": "1.0.0",
-    "description": "SRV-G5202604. Contratos centrales de la tabla 14 del APF2. Extensiones de ciclo de vida documentadas en README. Actualizaciones automaticas idempotentes, consulta vigente y snapshots historicos desde S2."
+    "description": "API REST/JSON de Reportes y Dashboards. Requiere JWT de integración para audience reports-api, issuer registrado y permisos reports:read/reports:write. Las consultas a stock también necesitan X-Stock-Authorization con el prefijo Bearer. El backend del inventario obtiene estas credenciales al actuar como consumidor."
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:8004",
-      "description": "Desarrollo local"
+      "url": "/",
+      "description": "Origen del servicio actual"
     }
   ],
   "paths": {
@@ -224,7 +224,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Reportes"
+        ]
       }
     },
     "/api/v1/inventario/indicadores": {
@@ -427,7 +430,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Reportes"
+        ]
       }
     },
     "/api/v1/inventario/estadisticas": {
@@ -648,7 +654,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Reportes"
+        ]
       }
     },
     "/api/v1/inventario/dashboards/{idDashboard}": {
@@ -884,7 +893,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Dashboards"
+        ]
       },
       "get": {
         "operationId": "consultarDashboard",
@@ -947,7 +959,10 @@
           "504": {
             "description": "Timeout"
           }
-        }
+        },
+        "tags": [
+          "Dashboards"
+        ]
       }
     },
     "/api/v1/inventario/actualizaciones": {
@@ -1018,7 +1033,519 @@
           "504": {
             "description": "Timeout"
           }
-        }
+        },
+        "tags": [
+          "Reportes"
+        ]
+      }
+    },
+    "/api/v1/inventario/dashboards": {
+      "post": {
+        "summary": "Crear configuración de dashboard",
+        "tags": [
+          "Dashboards"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "idDashboard": {
+                      "type": "string"
+                    },
+                    "nombre": {
+                      "type": "string"
+                    },
+                    "indicadores": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "filtros": {
+                      "$ref": "#/components/schemas/Filtros"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "filtros": {
+                    "$ref": "#/components/schemas/Filtros"
+                  },
+                  "nombre": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  },
+                  "indicadores": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "totalProductos",
+                        "productosConStock",
+                        "productosSinStock",
+                        "unidadesDisponibles"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "nombre",
+                  "indicadores"
+                ]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Requiere reports:write. No consulta la fuente de stock.",
+        "operationId": "post_api_v1_inventario_dashboards"
+      }
+    },
+    "/api/v1/inventario/reportes/{idReporte}": {
+      "get": {
+        "summary": "Consultar reporte histórico",
+        "tags": [
+          "Reportes"
+        ],
+        "parameters": [
+          {
+            "name": "idReporte",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Requiere reports:read. Devuelve historico=true; no consulta stock.",
+        "operationId": "get_api_v1_inventario_reportes__idReporte_"
+      }
+    },
+    "/health/live": {
+      "get": {
+        "summary": "Estado del proceso",
+        "tags": [
+          "Salud"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "operationId": "get_health_live"
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "summary": "Disponibilidad de SQLite",
+        "tags": [
+          "Salud"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "operationId": "get_health_ready"
       }
     }
   },

@@ -11,13 +11,21 @@ import transceiversRoutes from './routes/transceiversRoutes.js';
 import wholesaleStockRoutes from './routes/wholesaleStockRoutes.js';
 import additionalServicesRoutes from './routes/additionalServicesRoutes.js';
 import reportsRoutes from './routes/reportsRoutes.js';
+import { createApiDocs } from './apiDocs.cjs';
+const apiDocs = createApiDocs({ specPath: new URL('./openapi.json', import.meta.url), title: 'Backend de Inventario Quantic', browserSession: true });
 export function createApp({ auditSink } = {}) {
   const app = express();
   const config = getConfig();
   app.disable('x-powered-by');
   app.use(securityHeaders, auditMiddleware(auditSink));
+  app.use((req, res, next) => { if (!apiDocs(req, res)) next(); });
   app.use(cors({ origin: config.origins, credentials: true }));
-  app.use(protectWrites(config.origins));
+  // Swagger uses the same cookie session and CSRF header as the web client.
+  // Only fixed loopback origins are added in development; production must
+  // explicitly include its API origin in CLIENT_ORIGINS to enable Try it out.
+  const docsOrigins = process.env.NODE_ENV === 'production' ? [] :
+    [`http://localhost:${Number(process.env.PORT || 3000)}`, `http://127.0.0.1:${Number(process.env.PORT || 3000)}`];
+  app.use(protectWrites([...config.origins, ...docsOrigins]));
   // Solo el contrato de carga necesita un cuerpo amplio porque el XLSX viaja
   // como Base64. El resto de la API conserva el límite pequeño por seguridad.
   app.use(cookieParser());

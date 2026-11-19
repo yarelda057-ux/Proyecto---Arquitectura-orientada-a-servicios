@@ -1,0 +1,4694 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Mediador ESB — APIs de integración",
+    "version": "1.0.0",
+    "description": "Mediador HTTP/JSON. Las rutas protegidas requieren X-ESB-Key. Stock y reportes también requieren Authorization Bearer delegado. Notificaciones se traduce al proveedor SOAP en :8002/soap/notifications; este ESB no publica WSDL."
+  },
+  "paths": {
+    "/health/live": {
+      "get": {
+        "summary": "Estado del mediador",
+        "tags": [
+          "Salud"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "operationId": "get_health_live"
+      }
+    },
+    "/v1/stock/proveedores": {
+      "get": {
+        "summary": "Lista proveedores visibles",
+        "parameters": [
+          {
+            "name": "stock",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ]
+            },
+            "description": "Solo empresas aprobadas para proveer equipos."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "get_v1_stock_proveedores"
+      },
+      "post": {
+        "summary": "Administrador: registra proveedor",
+        "parameters": [],
+        "responses": {
+          "410": {
+            "description": "Operación retirada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sin autenticación",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Se requiere administrador",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true,
+        "description": "Operación retirada. Usar el servicio de empresas (3002); esta ruta devuelve HTTP 410 a un administrador autenticado.",
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "post_v1_stock_proveedores"
+      }
+    },
+    "/v1/stock/proveedores/{idMayorista}": {
+      "put": {
+        "summary": "Administrador: modifica proveedor",
+        "parameters": [
+          {
+            "name": "idMayorista",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          },
+          "410": {
+            "description": "Datos comerciales trasladados al servicio de empresas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "periodoActualizacionDias": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 365
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "periodoActualizacionDias"
+                ]
+              }
+            }
+          }
+        },
+        "description": "Solo modifica el periodo de actualización. Los datos y estados comerciales se gestionan en Servicios Adicionales; enviarlos aquí devuelve 410.",
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "put_v1_stock_proveedores__idMayorista_"
+      }
+    },
+    "/v1/stock/proveedores/{idMayorista}/usuarios": {
+      "post": {
+        "summary": "Administrador: crea acceso",
+        "parameters": [
+          {
+            "name": "idMayorista",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "410": {
+            "description": "Operación retirada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sin autenticación",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Se requiere administrador",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true,
+        "description": "Operación retirada. Usar el servicio de empresas (3002); esta ruta devuelve HTTP 410 a un administrador autenticado.",
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "post_v1_stock_proveedores__idMayorista__usuarios"
+      }
+    },
+    "/v1/stock/proveedores/{idMayorista}/usuarios/{idUsuario}/password": {
+      "put": {
+        "summary": "Administrador: cambia contraseña y revoca sesiones",
+        "parameters": [
+          {
+            "name": "idMayorista",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "idUsuario",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "410": {
+            "description": "Operación retirada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sin autenticación",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Se requiere administrador",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true,
+        "description": "Operación retirada. Usar el servicio de empresas (3002); esta ruta devuelve HTTP 410 a un administrador autenticado.",
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "put_v1_stock_proveedores__idMayorista__usuarios__idUsuario__password"
+      }
+    },
+    "/v1/stock/upload": {
+      "post": {
+        "summary": "Valida XLSX",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idMayorista": {
+                    "type": "string"
+                  },
+                  "formato": {
+                    "type": "string"
+                  },
+                  "archivoBase64": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "idMayorista",
+                  "formato",
+                  "archivoBase64"
+                ]
+              }
+            }
+          }
+        },
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "post_v1_stock_upload"
+      }
+    },
+    "/v1/stock/upload/{idLote}/validate": {
+      "get": {
+        "summary": "Informe de validación",
+        "parameters": [
+          {
+            "name": "idLote",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "get_v1_stock_upload__idLote__validate"
+      }
+    },
+    "/v1/stock/lotes/{idLote}": {
+      "get": {
+        "summary": "Estado de lote",
+        "parameters": [
+          {
+            "name": "idLote",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "get_v1_stock_lotes__idLote_"
+      }
+    },
+    "/v1/stock/lotes/{idLote}/confirmacion": {
+      "post": {
+        "summary": "Publica productos del lote",
+        "parameters": [
+          {
+            "name": "idLote",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idOperacion": {
+                    "type": "string"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "post_v1_stock_lotes__idLote__confirmacion"
+      }
+    },
+    "/v1/stock/products": {
+      "get": {
+        "summary": "Productos paginados",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "idMayorista",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "codigo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nombre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoria",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "get_v1_stock_products"
+      }
+    },
+    "/v1/stock/categories": {
+      "get": {
+        "summary": "Categorías",
+        "parameters": [
+          {
+            "name": "idMayorista",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoria",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "get_v1_stock_categories"
+      }
+    },
+    "/v1/stock/products/{idProducto}": {
+      "put": {
+        "summary": "Ajusta existencias con control de versión",
+        "parameters": [
+          {
+            "name": "idProducto",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "201": {
+            "description": "Registro creado"
+          },
+          "202": {
+            "description": "Lote recibido"
+          },
+          "400": {
+            "description": "Validación"
+          },
+          "401": {
+            "description": "Sin autenticación"
+          },
+          "403": {
+            "description": "Sin permisos"
+          },
+          "409": {
+            "description": "Conflicto"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idMayorista": {
+                    "type": "string"
+                  },
+                  "stockNuevo": {
+                    "type": "integer"
+                  },
+                  "motivo": {
+                    "type": "string"
+                  },
+                  "versionEsperada": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "idMayorista",
+                  "stockNuevo",
+                  "motivo",
+                  "versionEsperada"
+                ]
+              }
+            }
+          }
+        },
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "put_v1_stock_products__idProducto_"
+      }
+    },
+    "/v1/stock/notificaciones": {
+      "get": {
+        "summary": "Consultar estado de recordatorios (admin)",
+        "tags": [
+          "Stock"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "get_v1_stock_notificaciones"
+      }
+    },
+    "/v1/stock/notificaciones/{idMayorista}/estado": {
+      "put": {
+        "summary": "Activar o cancelar recordatorios (admin)",
+        "tags": [
+          "Stock"
+        ],
+        "parameters": [
+          {
+            "name": "idMayorista",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "activa": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "activa"
+                ]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "put_v1_stock_notificaciones__idMayorista__estado"
+      }
+    },
+    "/v1/stock/notificaciones/{idMayorista}/mensaje": {
+      "put": {
+        "summary": "Actualizar mensaje del recordatorio (admin)",
+        "tags": [
+          "Stock"
+        ],
+        "parameters": [
+          {
+            "name": "idMayorista",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mensajeAdicional": {
+                    "type": "string",
+                    "maxLength": 500
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "mensajeAdicional"
+                ]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "put_v1_stock_notificaciones__idMayorista__mensaje"
+      }
+    },
+    "/v1/stock/historial": {
+      "get": {
+        "summary": "Consultar historial de cargas",
+        "tags": [
+          "Stock"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "idMayorista",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fecha",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Día local de Perú, UTC-05:00."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "get_v1_stock_historial"
+      }
+    },
+    "/v1/stock/lotes/{idLote}/preview": {
+      "get": {
+        "summary": "Previsualizar productos del lote",
+        "tags": [
+          "Stock"
+        ],
+        "parameters": [
+          {
+            "name": "idLote",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "get_v1_stock_lotes__idLote__preview"
+      }
+    },
+    "/v1/stock/lotes/{idLote}/excel": {
+      "get": {
+        "summary": "Descargar archivo XLSX codificado en Base64",
+        "tags": [
+          "Stock"
+        ],
+        "parameters": [
+          {
+            "name": "idLote",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "formato",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "presentacion"
+              ]
+            },
+            "description": "Omitir para obtener el archivo original o reconstruido."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "nombreArchivo": {
+                      "type": "string"
+                    },
+                    "archivoBase64": {
+                      "type": "string"
+                    },
+                    "original": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "get_v1_stock_lotes__idLote__excel"
+      }
+    },
+    "/v1/reports/reportes": {
+      "post": {
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Stock-Authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Credencial Bearer delegada de la fuente"
+          },
+          {
+            "in": "header",
+            "name": "X-Correlation-ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "tipo": {
+                    "const": "stockActual"
+                  },
+                  "formato": {
+                    "const": "JSON"
+                  },
+                  "filtros": {
+                    "$ref": "#/components/schemas/Filtros"
+                  },
+                  "versionInventario": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                },
+                "required": [
+                  "tipo",
+                  "formato",
+                  "versionInventario"
+                ]
+              },
+              "example": {
+                "tipo": "stockActual",
+                "filtros": {
+                  "categoria": "redes"
+                },
+                "formato": "JSON",
+                "versionInventario": "INV-106"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Resultado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "idReporte": {
+                      "type": "string"
+                    },
+                    "tipo": {
+                      "const": "stockActual"
+                    },
+                    "datos": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Producto"
+                      }
+                    },
+                    "versionInventario": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "actualizadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "generadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "sinRegistros": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Entrada inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Versión no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Fuente o persistencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Tiempo de espera agotado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Reportes"
+        ],
+        "operationId": "post_v1_reports_reportes"
+      }
+    },
+    "/v1/reports/indicadores": {
+      "get": {
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Stock-Authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Credencial Bearer delegada de la fuente"
+          },
+          {
+            "in": "header",
+            "name": "X-Correlation-ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "categoria",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "idMayorista",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "versionInventario",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "totalProductos": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "productosConStock": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "productosSinStock": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "unidadesDisponibles": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "versionInventario": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "actualizadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "generadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "sinRegistros": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Entrada inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Versión no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Fuente o persistencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Tiempo de espera agotado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Reportes"
+        ],
+        "operationId": "get_v1_reports_indicadores"
+      }
+    },
+    "/v1/reports/estadisticas": {
+      "get": {
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Stock-Authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Credencial Bearer delegada de la fuente"
+          },
+          {
+            "in": "header",
+            "name": "X-Correlation-ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "categoria",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "idMayorista",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "versionInventario",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "agruparPor",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "categoria"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "grupos": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "categoria": {
+                            "type": "string"
+                          },
+                          "totalProductos": {
+                            "type": "integer"
+                          },
+                          "unidadesEnStock": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "categoria",
+                          "totalProductos",
+                          "unidadesEnStock"
+                        ]
+                      }
+                    },
+                    "versionInventario": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "actualizadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "generadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "sinRegistros": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Entrada inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Versión no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Fuente o persistencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Tiempo de espera agotado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Reportes"
+        ],
+        "operationId": "get_v1_reports_estadisticas"
+      }
+    },
+    "/v1/reports/dashboards/{idDashboard}": {
+      "put": {
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Stock-Authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Credencial Bearer delegada de la fuente"
+          },
+          {
+            "in": "header",
+            "name": "X-Correlation-ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "idDashboard",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "versionInventario": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "filtros": {
+                    "$ref": "#/components/schemas/Filtros"
+                  },
+                  "nombre": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  },
+                  "indicadores": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "totalProductos",
+                        "productosConStock",
+                        "productosSinStock",
+                        "unidadesDisponibles"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "nombre",
+                  "indicadores",
+                  "versionInventario"
+                ]
+              },
+              "example": {
+                "nombre": "Disponibilidad comercial",
+                "indicadores": [
+                  "productosConStock",
+                  "productosSinStock"
+                ],
+                "filtros": {
+                  "categoria": "redes"
+                },
+                "versionInventario": "INV-106"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "idDashboard": {
+                      "type": "string"
+                    },
+                    "indicadores": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer"
+                      }
+                    },
+                    "versionInventario": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "actualizadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "generadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "sinRegistros": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Entrada inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Versión no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Fuente o persistencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Tiempo de espera agotado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Dashboards"
+        ],
+        "operationId": "put_v1_reports_dashboards__idDashboard_"
+      },
+      "get": {
+        "description": "Sin actual=true devuelve configuracion almacenada con historico=true. Con actual=true consulta la fuente y devuelve indicadores, grupos, proveedores, clasificacion, catalogo de filtros y configuracion; nunca usa cache si falla la fuente.",
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "idDashboard",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "actual",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Stock-Authorization",
+            "description": "Obligatoria si actual=true.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Configuracion historica o resultado vigente con fechas y version."
+          },
+          "400": {
+            "description": "Entrada invalida"
+          },
+          "401": {
+            "description": "Credencial invalida"
+          },
+          "403": {
+            "description": "Permisos insuficientes"
+          },
+          "404": {
+            "description": "Dashboard inexistente"
+          },
+          "409": {
+            "description": "Operacion o version en conflicto"
+          },
+          "503": {
+            "description": "Fuente no disponible"
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        },
+        "tags": [
+          "Dashboards"
+        ],
+        "operationId": "get_v1_reports_dashboards__idDashboard_"
+      }
+    },
+    "/v1/reports/actualizaciones": {
+      "post": {
+        "description": "Extension para coordinadores. Actualiza todos los dashboards del consumidor con una version exacta; conserva filtros y nombre. idOperacion es idempotente. Una version antigua queda SUPERADO sin sobrescribir un resultado mas reciente.",
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Stock-Authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "idOperacion",
+                  "versionInventario"
+                ],
+                "properties": {
+                  "idOperacion": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "versionInventario": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Acuse durable con idOperacion, versionInventario y dashboards (idDashboard, estado ACTUALIZADO/SUPERADO, versionDashboard)."
+          },
+          "400": {
+            "description": "Entrada invalida"
+          },
+          "401": {
+            "description": "Credencial invalida"
+          },
+          "403": {
+            "description": "Permisos insuficientes"
+          },
+          "409": {
+            "description": "Operacion o version en conflicto"
+          },
+          "503": {
+            "description": "Fuente no disponible"
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        },
+        "tags": [
+          "Reportes"
+        ],
+        "operationId": "post_v1_reports_actualizaciones"
+      }
+    },
+    "/v1/reports/dashboards": {
+      "post": {
+        "summary": "Crear configuración de dashboard",
+        "tags": [
+          "Dashboards"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "idDashboard": {
+                      "type": "string"
+                    },
+                    "nombre": {
+                      "type": "string"
+                    },
+                    "indicadores": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "filtros": {
+                      "$ref": "#/components/schemas/Filtros"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "filtros": {
+                    "$ref": "#/components/schemas/Filtros"
+                  },
+                  "nombre": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  },
+                  "indicadores": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "totalProductos",
+                        "productosConStock",
+                        "productosSinStock",
+                        "unidadesDisponibles"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "nombre",
+                  "indicadores"
+                ]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "description": "Requiere reports:write. No consulta la fuente de stock.",
+        "operationId": "post_v1_reports_dashboards"
+      }
+    },
+    "/v1/reports/reportes/{idReporte}": {
+      "get": {
+        "summary": "Consultar reporte histórico",
+        "tags": [
+          "Reportes"
+        ],
+        "parameters": [
+          {
+            "name": "idReporte",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "description": "Requiere reports:read. Devuelve historico=true; no consulta stock.",
+        "operationId": "get_v1_reports_reportes__idReporte_"
+      }
+    },
+    "/v1/inventory-source": {
+      "get": {
+        "summary": "Inventario completo y consistente, o version historica exacta. El alcance del mayorista se aplica tambien al historico.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "versionInventario",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "versionInventario, revisionInventario, actualizadoEn, total y productos. Cada producto contiene idProducto, idMayorista, nombre, stock, categoria y categoriaOrigen."
+          },
+          "409": {
+            "description": "Version no conservada"
+          },
+          "503": {
+            "description": "Replica set no disponible o version incompleta"
+          }
+        },
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "get_v1_inventory_source"
+      }
+    },
+    "/v1/inventory-events": {
+      "get": {
+        "summary": "Eventos durables de versiones confirmadas (solo administrador o coordinador).",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "despues",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "eventos: hasta 25 elementos ordenados con versionInventario, secuencia, actorId, idLote, idOperacion, actualizadoEn."
+          },
+          "400": {
+            "description": "Secuencia invalida"
+          },
+          "403": {
+            "description": "No autorizado"
+          }
+        },
+        "tags": [
+          "Stock"
+        ],
+        "security": [
+          {
+            "EsbKey": [],
+            "bearerAuth": []
+          }
+        ],
+        "operationId": "get_v1_inventory_events"
+      }
+    },
+    "/v1/notifications/register": {
+      "post": {
+        "summary": "Registrar programación SOAP",
+        "tags": [
+          "Notificaciones SOAP"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Success": {
+                      "type": "boolean"
+                    },
+                    "Code": {
+                      "type": "string"
+                    },
+                    "Message": {
+                      "type": "string"
+                    },
+                    "SupplierId": {
+                      "type": "string"
+                    },
+                    "correlationId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "SupplierId": {
+                    "type": "string"
+                  },
+                  "SupplierName": {
+                    "type": "string"
+                  },
+                  "ContactEmail": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "UpdatePeriodDays": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 365
+                  },
+                  "LastCatalogUpdate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "AdditionalMessage": {
+                    "type": "string",
+                    "maxLength": 500
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "SupplierId",
+                  "SupplierName",
+                  "ContactEmail",
+                  "UpdatePeriodDays",
+                  "LastCatalogUpdate"
+                ]
+              }
+            }
+          }
+        },
+        "description": "ConsumerSystem lo asigna el ESB; no debe incluirse en el cuerpo. La credencial SOAP se mantiene en el servidor.",
+        "operationId": "post_v1_notifications_register"
+      }
+    },
+    "/v1/notifications/update": {
+      "post": {
+        "summary": "Actualizar programación SOAP",
+        "tags": [
+          "Notificaciones SOAP"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Success": {
+                      "type": "boolean"
+                    },
+                    "Code": {
+                      "type": "string"
+                    },
+                    "Message": {
+                      "type": "string"
+                    },
+                    "SupplierId": {
+                      "type": "string"
+                    },
+                    "correlationId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "SupplierId": {
+                    "type": "string"
+                  },
+                  "SupplierName": {
+                    "type": "string"
+                  },
+                  "ContactEmail": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "UpdatePeriodDays": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 365
+                  },
+                  "LastCatalogUpdate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "AdditionalMessage": {
+                    "type": "string",
+                    "maxLength": 500
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "SupplierId",
+                  "SupplierName",
+                  "ContactEmail",
+                  "UpdatePeriodDays",
+                  "LastCatalogUpdate"
+                ]
+              }
+            }
+          }
+        },
+        "description": "ConsumerSystem lo asigna el ESB; no debe incluirse en el cuerpo. La credencial SOAP se mantiene en el servidor.",
+        "operationId": "post_v1_notifications_update"
+      }
+    },
+    "/v1/notifications/catalogUpdated": {
+      "post": {
+        "summary": "Informar actualización del catálogo",
+        "tags": [
+          "Notificaciones SOAP"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Success": {
+                      "type": "boolean"
+                    },
+                    "Code": {
+                      "type": "string"
+                    },
+                    "Message": {
+                      "type": "string"
+                    },
+                    "SupplierId": {
+                      "type": "string"
+                    },
+                    "correlationId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "SupplierId": {
+                    "type": "string"
+                  },
+                  "UpdatedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "SupplierId",
+                  "UpdatedAt"
+                ]
+              }
+            }
+          }
+        },
+        "description": "ConsumerSystem lo asigna el ESB; no debe incluirse en el cuerpo. La credencial SOAP se mantiene en el servidor.",
+        "operationId": "post_v1_notifications_catalogUpdated"
+      }
+    },
+    "/v1/notifications/cancel": {
+      "post": {
+        "summary": "Cancelar programación",
+        "tags": [
+          "Notificaciones SOAP"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Success": {
+                      "type": "boolean"
+                    },
+                    "Code": {
+                      "type": "string"
+                    },
+                    "Message": {
+                      "type": "string"
+                    },
+                    "SupplierId": {
+                      "type": "string"
+                    },
+                    "correlationId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "SupplierId": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "SupplierId"
+                ]
+              }
+            }
+          }
+        },
+        "description": "ConsumerSystem lo asigna el ESB; no debe incluirse en el cuerpo. La credencial SOAP se mantiene en el servidor.",
+        "operationId": "post_v1_notifications_cancel"
+      }
+    },
+    "/v1/notifications/get": {
+      "post": {
+        "summary": "Consultar programación",
+        "tags": [
+          "Notificaciones SOAP"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Success": {
+                      "type": "boolean"
+                    },
+                    "Code": {
+                      "type": "string"
+                    },
+                    "Message": {
+                      "type": "string"
+                    },
+                    "SupplierId": {
+                      "type": "string"
+                    },
+                    "correlationId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Error de validación o de comunicación SOAP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "SupplierId": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "SupplierId"
+                ]
+              }
+            }
+          }
+        },
+        "description": "ConsumerSystem lo asigna el ESB; no debe incluirse en el cuerpo. La credencial SOAP se mantiene en el servidor.",
+        "operationId": "post_v1_notifications_get"
+      }
+    },
+    "/v1/additional-services/empresas": {
+      "get": {
+        "summary": "Buscar empresas aprobadas",
+        "tags": [
+          "Empresas"
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciudad",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "EsbKey": []
+          }
+        ],
+        "operationId": "get_v1_additional_services_empresas"
+      }
+    },
+    "/v1/additional-services/empresas/{id}": {
+      "get": {
+        "summary": "Consultar empresa pública y servicios aprobados",
+        "tags": [
+          "Empresas"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "EsbKey": []
+          }
+        ],
+        "operationId": "get_v1_additional_services_empresas__id_"
+      }
+    },
+    "/v1/additional-services/servicios": {
+      "get": {
+        "summary": "Buscar servicios publicados",
+        "tags": [
+          "Servicios"
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoria",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciudad",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tipo_servicio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "EsbKey": []
+          }
+        ],
+        "operationId": "get_v1_additional_services_servicios"
+      }
+    },
+    "/v1/additional-services/servicios/{id}": {
+      "get": {
+        "summary": "Consultar ficha pública de servicio",
+        "tags": [
+          "Servicios"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "EsbKey": []
+          }
+        ],
+        "operationId": "get_v1_additional_services_servicios__id_"
+      }
+    }
+  },
+  "security": [
+    {
+      "EsbKey": []
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Filtros": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "categoria": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "idMayorista": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          }
+        },
+        "required": []
+      },
+      "Producto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "productoId": {
+            "type": "string"
+          },
+          "idMayorista": {
+            "type": "string"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "categoria": {
+            "type": "string"
+          },
+          "stock": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "productoId",
+          "idMayorista",
+          "nombre",
+          "categoria",
+          "stock"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "EsbKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-ESB-Key"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Origen del servicio actual"
+    }
+  ]
+}

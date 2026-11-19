@@ -147,3 +147,12 @@ srv-servicios-adicionales/
 - **Independencia del Microservicio:** Puede ejecutarse y probarse sin depender de los otros microservicios aún no desarrollados.
 - **Integración con Servicio S1 (Control de Accesos y Auditoría):** El acceso al portal de empresas y al panel de administración se integrará posteriormente mediante tokens emitidos por S1. Actualmente se utiliza la identificación por RUC oficial para facilitar la validación funcional.
 - **Integración con Sistema de Inventario:** El sistema principal consumirá `GET /api/v1/catalogo/servicios` y `GET /api/v1/catalogo/empresas` mediante llamadas REST HTTP con formato estándar JSON.
+
+## Swagger UI
+
+- Interfaz: http://localhost:3002/docs (`/api-docs` también redirige aquí).
+- Contrato local: http://localhost:3002/openapi.json.
+- Reiniciar este proceso después de actualizar el código.
+- La interfaz carga Swagger UI 5.34.1 desde cdn.jsdelivr.net; el navegador necesita internet. El contrato JSON se sirve localmente.
+- Las operaciones mantienen su autenticación y permisos; no se guardan credenciales en el contrato.
+- [Autenticación y verificación de todos los servicios](../docs/SWAGGER.md).

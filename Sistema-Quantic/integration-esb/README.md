@@ -25,3 +25,12 @@ Escucha en `http://127.0.0.1:8003`. Comprueba `/health/live`. Operaciones autent
 El servicio de mayoristas persiste eventos en `NotificationOutbox`. Su worker procesa un evento por vez y reintenta errores temporales con espera exponencial hasta una hora. Un proveedor nuevo recibe una programación con fecha base igual a su última carga procesada o, si no tiene, su fecha de registro. Cada lote confirmado genera un evento idempotente `catalog:<batchId>` con el `processedAt` guardado. La desactivación produce cancelación. La cola no detiene el alta o la actualización del inventario.
 
 El administrador puede revisar estados y editar el mensaje adicional desde el módulo **Notificaciones** del frontend. Un mensaje nuevo se envía al proveedor SOAP cuando el worker sincroniza la programación.
+
+## Swagger UI
+
+- Interfaz: http://localhost:8003/docs (`/api-docs` también redirige aquí).
+- Contrato local: http://localhost:8003/openapi.json.
+- Reiniciar este proceso después de actualizar el código.
+- La interfaz carga Swagger UI 5.34.1 desde cdn.jsdelivr.net; el navegador necesita internet. El contrato JSON se sirve localmente.
+- Las operaciones mantienen su autenticación y permisos; no se guardan credenciales en el contrato.
+- [Autenticación y verificación de todos los servicios](../docs/SWAGGER.md).

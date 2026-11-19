@@ -1,27 +1,9 @@
-import express from 'express';
-import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { config } from './config.js';
-import { additionalServicesRouter } from './additionalServices.js';
-import { createSoapClient } from './soapClient.js';
-import { reportsRouter } from './reports.js';
-import { stockRouter } from './stock.js';
-const app = express(); app.disable('x-powered-by');
-app.use('/v1/stock/upload', express.json({ limit: '14mb', type: 'application/json' }));
-app.use(express.json({ limit: '16kb', type: 'application/json' }));
-app.get('/health/live', (_req,res)=>res.json({status:'ok'}));
-app.use((req,res,next)=>{ const correlationId = req.get('X-Correlation-ID')?.slice(0,100) || randomUUID(); res.set('X-Correlation-ID',correlationId); req.correlationId=correlationId; const supplied=Buffer.from(req.get('X-ESB-Key')||''); const expected=Buffer.from(config.apiKey); if(supplied.length!==expected.length || !timingSafeEqual(supplied,expected)) return res.status(401).json({code:'UNAUTHORIZED',message:'Credenciales de integración inválidas.',correlationId}); next(); });
-app.use('/v1/additional-services', additionalServicesRouter());
-app.use('/v1/stock', stockRouter());
-const reporting = reportsRouter();
-app.use(['/v1/reports', '/v1/inventory-source', '/v1/inventory-events'], (req, res, next) => {
-  req.url = req.baseUrl.slice('/v1'.length) + req.url;
-  return reporting(req, res, next);
-});
-const invoke=createSoapClient({url:config.soapUrl,key:config.soapKey,timeoutMs:config.timeoutMs,consumerSystem:config.consumerSystem});
-const routes={ register:'RegisterSupplierSchedule', update:'RegisterSupplierSchedule', catalogUpdated:'ReportCatalogUpdate', cancel:'CancelSupplierSchedule', get:'GetSupplierSchedule' };
-const schemas={ register:['SupplierId','SupplierName','ContactEmail','UpdatePeriodDays','LastCatalogUpdate','AdditionalMessage'], update:['SupplierId','SupplierName','ContactEmail','UpdatePeriodDays','LastCatalogUpdate','AdditionalMessage'], catalogUpdated:['SupplierId','UpdatedAt'], cancel:['SupplierId'], get:['SupplierId'] };
-app.post('/v1/notifications/:action',async(req,res)=>{ const action=req.params.action, op=routes[action]; if(!op) return res.status(404).json({code:'NOT_FOUND',message:'Operación no reconocida.',correlationId:req.correlationId}); if(!req.body||typeof req.body!=='object'||Array.isArray(req.body)||Object.keys(req.body).some(k=>!schemas[action].includes(k))) return res.status(400).json({code:'INVALID_ARGUMENT',message:'Cuerpo de solicitud inválido.',correlationId:req.correlationId}); try { const result=await invoke(op,req.body,req.correlationId); if(!result.Success && action==='cancel' && result.Code==='NOT_FOUND') return res.json({Success:true,Code:'ALREADY_CANCELLED',Message:'No había una programación activa.',SupplierId:req.body.SupplierId,correlationId:req.correlationId}); if(!result.Success && action==='cancel' && result.Code==='NOT_FOUND') return res.json({Success:true,Code:'ALREADY_CANCELLED',Message:'No había una programación activa.',SupplierId:req.body.SupplierId,correlationId:req.correlationId}); if(!result.Success) { const status=['NOT_FOUND'].includes(result.Code)?404:['INVALID_ARGUMENT','INVALID_DATE','STALE_UPDATE'].includes(result.Code)?422:409; return res.status(status).json({...result,correlationId:req.correlationId}); } res.json({...result,correlationId:req.correlationId}); } catch(err) { const status=err.status===504?504:502; res.status(status).json({code:status===504?'UPSTREAM_TIMEOUT':'UPSTREAM_ERROR',message:err.message,correlationId:req.correlationId}); } });
-app.use((_err,_req,res,_next)=>res.status(400).json({code:'INVALID_REQUEST',message:'Solicitud inválida.'}));
-const server=app.listen(config.port,config.host,()=>console.info(`Mediador ESB disponible en http://${config.host}:${config.port}`));
-function stop(){server.close(()=>process.exit(0));} process.on('SIGINT',stop); process.on('SIGTERM',stop);
+import { createApp } from './app.js';
+
+const app = createApp(config);
+const server = app.listen(config.port, config.host, () => console.info(`Mediador ESB disponible en http://${config.host}:${config.port}`));
+function stop() { server.close(() => process.exit(0)); }
+process.on('SIGINT', stop);
+process.on('SIGTERM', stop);
 export { app };

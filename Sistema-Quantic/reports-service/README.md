@@ -98,3 +98,13 @@ Ejecutar desde la raíz: `node scripts/probar-reportes-integracion.cjs`. Requier
 Comprueba registro y acceso, carga y confirmación idempotente a través del ESB, categorías, caída de S4, tres reintentos, reinicio del coordinador, recuperación de versiones antiguas, reportes JSON, filtros, permisos, reinicio de SQLite y caída/recuperación de S1 sin duplicados. La prueba visual es optativa: establecer `QUANTIC_VISUAL_TESTS=true` antes de ejecutarlo. En esta revisión Chrome no logró arrancar por un fallo de Crashpad en el entorno; la revisión visual no se considera acreditada. El flujo HTTP y las bases reales sí se verificaron. Logs y resultado quedan en `tmp/reports-integration-<id>`.
 
 Para aplicar en el entorno habitual: detener su ventana con Ctrl+C, abrir `INICIAR-QUANTIC.bat` y recargar el navegador. Se conservan las bases existentes. Esta revisión completa el trabajo de S4 descrito aquí; no certifica los contratos pendientes de otros servicios del PDF.
+
+## Swagger UI
+
+- Interfaz: http://localhost:8004/docs (`/api-docs` también redirige aquí).
+- Contrato local: http://localhost:8004/openapi.json.
+- Reiniciar este proceso después de actualizar el código.
+- La interfaz carga Swagger UI 5.34.1 desde cdn.jsdelivr.net; el navegador necesita internet. El contrato JSON se sirve localmente.
+- Las operaciones mantienen su autenticación y permisos; no se guardan credenciales en el contrato.
+- [Autenticación y verificación de todos los servicios](../docs/SWAGGER.md).
+- Este servicio está implementado como REST/JSON; no publica WSDL.

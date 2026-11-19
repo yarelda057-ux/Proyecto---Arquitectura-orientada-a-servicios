@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { createApiDocs } from '../apiDocs.cjs';
 import { authenticate } from './auth.js';
 import { calculate, dashboardResult, olderThan, fail, filters, indicators, object, text, version } from './domain.js';
+const apiDocs = createApiDocs({ specPath: new URL('../openapi.json', import.meta.url), title: 'Reportes y Dashboards de Inventario' });
 
 async function readBody(req) {
   if (!/^application\/json(?:;|$)/i.test(req.headers['content-type'] || '')) throw fail(400, 'Se requiere JSON.');
@@ -22,8 +23,8 @@ export function createHandler({ clients, repository, source }) {
     res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.setHeader('Cache-Control', 'no-store'); res.setHeader('X-Content-Type-Options', 'nosniff'); res.setHeader('X-Correlation-ID', correlationId);
     const send = (status, data) => { res.statusCode = status; res.end(JSON.stringify(data)); };
     try {
+      if (apiDocs(req, res)) return;
       const url = new URL(req.url, 'http://localhost');
-      if (req.method === 'GET' && url.pathname === '/openapi.json') return send(200, JSON.parse(readFileSync(new URL('../openapi.json', import.meta.url), 'utf8')));
       if (req.method === 'GET' && ['/health/live', '/health/ready'].includes(url.pathname)) { if (url.pathname.endsWith('ready')) repository.ping(); return send(200, { status: 'ok', servicio: 'SRV-G5202604' }); }
       const scope = ['GET', 'HEAD'].includes(req.method) ? 'reports:read' : 'reports:write';
       const identity = authenticate(req.headers.authorization, clients, scope);

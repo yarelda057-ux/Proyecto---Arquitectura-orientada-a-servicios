@@ -55,3 +55,12 @@ En otro sistema no ejecutar migración: crear su administrador y proveedores pro
 ## Pruebas
 npm test: lectura de Excel y validación.
 npm run test:integration: inicia la API sin el servidor principal y prueba permisos, cuentas, carga, publicación, aislamiento y contraseñas con una base temporal eliminada al terminar.
+
+## Swagger UI
+
+- Interfaz: http://localhost:3001/docs (`/api-docs` también redirige aquí).
+- Contrato local: http://localhost:3001/openapi.json.
+- Reiniciar este proceso después de actualizar el código.
+- La interfaz carga Swagger UI 5.34.1 desde cdn.jsdelivr.net; el navegador necesita internet. El contrato JSON se sirve localmente.
+- Las operaciones mantienen su autenticación y permisos; no se guardan credenciales en el contrato.
+- [Autenticación y verificación de todos los servicios](../docs/SWAGGER.md).

@@ -267,6 +267,119 @@
   },
   "components": {
     "schemas": {
+      "AnalyticsContext": {
+        "properties": {
+          "operation": {
+            "type": "string",
+            "const": "INVENTORY_ANALYTICS",
+            "title": "Operation"
+          },
+          "inventory_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inventory Version"
+          },
+          "report_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "stockActual"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Report Type"
+          },
+          "filters": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnalyticsFilters"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "dashboard_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dashboard Id"
+          },
+          "indicators": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "totalProductos",
+                    "productosConStock",
+                    "productosSinStock",
+                    "unidadesDisponibles"
+                  ]
+                },
+                "type": "array",
+                "maxItems": 4
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Indicators"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "operation"
+        ],
+        "title": "AnalyticsContext"
+      },
+      "AnalyticsFilters": {
+        "properties": {
+          "categoria": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Categoria"
+          },
+          "idMayorista": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idmayorista"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "AnalyticsFilters"
+      },
       "EventIn": {
         "properties": {
           "event_id": {
@@ -328,6 +441,16 @@
             "type": "string",
             "format": "uuid",
             "title": "Request Id"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnalyticsContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -404,6 +527,16 @@
             "type": "string",
             "format": "uuid",
             "title": "Request Id"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnalyticsContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "id": {
             "type": "string",

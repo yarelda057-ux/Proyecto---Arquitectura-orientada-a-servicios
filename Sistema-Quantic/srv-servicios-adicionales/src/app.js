@@ -16,6 +16,9 @@ const serviciosRoutes = require('./routes/serviciosRoutes');
 const adminDemoRoutes = require('./routes/adminDemoRoutes');
 
 const app = express();
+const { createApiDocs } = require('../apiDocs.cjs');
+const apiDocs = createApiDocs({ specPath: path.join(__dirname, '../openapi.json'), title: 'Consulta de Servicios Adicionales' });
+app.use((req, res, next) => { if (!apiDocs(req, res)) next(); });
 
 // Middlewares globales
 app.use(cors());
