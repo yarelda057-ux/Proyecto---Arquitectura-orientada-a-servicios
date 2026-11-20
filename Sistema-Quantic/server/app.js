@@ -1,4 +1,5 @@
 import express from 'express';
+import reportsRoutes from './routes/reportsRoutes.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { getConfig } from './config.js';
@@ -24,6 +25,7 @@ export function createApp({ auditSink } = {}) {
   app.use(express.json({ limit: '64kb' }));
   app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
   app.use('/api/additional-services', additionalServicesRoutes);
+  app.use('/api/v1/inventario', reportsRoutes);
   app.use('/api/users', userRoutes);
   app.use('/api/audit', auditRoutes);
   app.use('/api/devices', devicesRoutes);

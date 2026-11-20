@@ -300,6 +300,18 @@ async function applyBatch(batch, actorId) {
 
 const router = Router();
 router.use(validateAuth);
+router.get('/snapshot', requireAdmin, async (req,res,next)=>{
+ try {
+  const rows=await SupplierStock.find({}).sort({_id:1}).limit(100001).lean();
+  if(rows.length>100000)return res.status(413).json({message:'El inventario supera el limite del reporte.'});
+  const productos=rows.map(p=>({idProducto:String(p._id),nombre:p.descripcion,categoria:p.categoria||'Sin categoría',idMayorista:p.supplierId,stock:p.cantidad}));
+  const versionInventario='ACT-'+createHash('sha256').update(JSON.stringify(rows)).digest('hex').slice(0,32);
+  if(req.query.versionInventario && req.query.versionInventario!==versionInventario)return res.status(409).json({message:'El stock cambio. Actualiza el reporte.'});
+  const actualizadoEn=new Date(Math.max(0,...rows.map(p=>new Date(p.updatedAt).getTime()))).toISOString();
+  res.json({productos,total:productos.length,versionInventario,actualizadoEn});
+ }catch(e){next(e);}
+});
+router.get('/versiones',requireAdmin,(_req,res)=>res.status(422).json({message:'Esta instalación conserva stock vigente; no dispone de cortes históricos.'}));
 router.use(async (req, res, next) => {
   if (req.user.role === 'mayorista') await getSupplier(req.user.supplierId, { activeOnly: true });
   if (!['GET', 'HEAD'].includes(req.method) && !['admin', 'mayorista'].includes(req.user.role)) return res.status(403).json({ message: 'No tienes permiso para modificar stock de mayoristas.' });

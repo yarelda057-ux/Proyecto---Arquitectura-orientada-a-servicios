@@ -1,0 +1,1609 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Servicio de Reportes y Dashboards de Inventario",
+    "version": "1.0.0",
+    "description": "API REST/JSON de Reportes y Dashboards. Requiere JWT de integración para audience reports-api, issuer registrado y permisos reports:read/reports:write. Las consultas a stock también necesitan X-Stock-Authorization con el prefijo Bearer. El backend del inventario obtiene estas credenciales al actuar como consumidor."
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Origen del servicio actual"
+    }
+  ],
+  "paths": {
+    "/api/v1/inventario/reportes": {
+      "post": {
+        "operationId": "generarReporte",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Stock-Authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Credencial Bearer delegada de la fuente"
+          },
+          {
+            "in": "header",
+            "name": "X-Correlation-ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "tipo": {
+                    "const": "stockActual"
+                  },
+                  "formato": {
+                    "const": "JSON"
+                  },
+                  "filtros": {
+                    "$ref": "#/components/schemas/Filtros"
+                  },
+                  "versionInventario": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                },
+                "required": [
+                  "tipo",
+                  "formato",
+                  "versionInventario"
+                ]
+              },
+              "example": {
+                "tipo": "stockActual",
+                "filtros": {
+                  "categoria": "redes"
+                },
+                "formato": "JSON",
+                "versionInventario": "INV-106"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Resultado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "idReporte": {
+                      "type": "string"
+                    },
+                    "tipo": {
+                      "const": "stockActual"
+                    },
+                    "datos": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Producto"
+                      }
+                    },
+                    "versionInventario": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "actualizadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "generadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "sinRegistros": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Entrada inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Versión no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Fuente o persistencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Tiempo de espera agotado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Reportes"
+        ]
+      }
+    },
+    "/api/v1/inventario/indicadores": {
+      "get": {
+        "operationId": "consultarIndicadores",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Stock-Authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Credencial Bearer delegada de la fuente"
+          },
+          {
+            "in": "header",
+            "name": "X-Correlation-ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "categoria",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "idMayorista",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "versionInventario",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "totalProductos": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "productosConStock": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "productosSinStock": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "unidadesDisponibles": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "versionInventario": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "actualizadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "generadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "sinRegistros": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Entrada inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Versión no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Fuente o persistencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Tiempo de espera agotado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Reportes"
+        ]
+      }
+    },
+    "/api/v1/inventario/estadisticas": {
+      "get": {
+        "operationId": "obtenerEstadisticasInventario",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Stock-Authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Credencial Bearer delegada de la fuente"
+          },
+          {
+            "in": "header",
+            "name": "X-Correlation-ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "categoria",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "idMayorista",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "versionInventario",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "agruparPor",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "categoria"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "grupos": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "categoria": {
+                            "type": "string"
+                          },
+                          "totalProductos": {
+                            "type": "integer"
+                          },
+                          "unidadesEnStock": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "categoria",
+                          "totalProductos",
+                          "unidadesEnStock"
+                        ]
+                      }
+                    },
+                    "versionInventario": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "actualizadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "generadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "sinRegistros": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Entrada inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Versión no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Fuente o persistencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Tiempo de espera agotado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Reportes"
+        ]
+      }
+    },
+    "/api/v1/inventario/dashboards/{idDashboard}": {
+      "put": {
+        "operationId": "actualizarDashboard",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Stock-Authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Credencial Bearer delegada de la fuente"
+          },
+          {
+            "in": "header",
+            "name": "X-Correlation-ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "idDashboard",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "versionInventario": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "filtros": {
+                    "$ref": "#/components/schemas/Filtros"
+                  },
+                  "nombre": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  },
+                  "indicadores": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "totalProductos",
+                        "productosConStock",
+                        "productosSinStock",
+                        "unidadesDisponibles"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "nombre",
+                  "indicadores",
+                  "versionInventario"
+                ]
+              },
+              "example": {
+                "nombre": "Disponibilidad comercial",
+                "indicadores": [
+                  "productosConStock",
+                  "productosSinStock"
+                ],
+                "filtros": {
+                  "categoria": "redes"
+                },
+                "versionInventario": "INV-106"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "idDashboard": {
+                      "type": "string"
+                    },
+                    "indicadores": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer"
+                      }
+                    },
+                    "versionInventario": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "actualizadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "generadoEn": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "sinRegistros": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Entrada inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Versión no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Fuente o persistencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Tiempo de espera agotado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Dashboards"
+        ]
+      },
+      "get": {
+        "operationId": "consultarDashboard",
+        "description": "Sin actual=true devuelve configuracion almacenada con historico=true. Con actual=true consulta la fuente y devuelve indicadores, grupos, proveedores, clasificacion, catalogo de filtros y configuracion; nunca usa cache si falla la fuente.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "idDashboard",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "actual",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Stock-Authorization",
+            "description": "Obligatoria si actual=true.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Configuracion historica o resultado vigente con fechas y version."
+          },
+          "400": {
+            "description": "Entrada invalida"
+          },
+          "401": {
+            "description": "Credencial invalida"
+          },
+          "403": {
+            "description": "Permisos insuficientes"
+          },
+          "404": {
+            "description": "Dashboard inexistente"
+          },
+          "409": {
+            "description": "Operacion o version en conflicto"
+          },
+          "503": {
+            "description": "Fuente no disponible"
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        },
+        "tags": [
+          "Dashboards"
+        ]
+      }
+    },
+    "/api/v1/inventario/actualizaciones": {
+      "post": {
+        "operationId": "actualizarDashboardsPorVersion",
+        "description": "Extension para coordinadores. Actualiza todos los dashboards del consumidor con una version exacta; conserva filtros y nombre. idOperacion es idempotente. Una version antigua queda SUPERADO sin sobrescribir un resultado mas reciente.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Stock-Authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "idOperacion",
+                  "versionInventario"
+                ],
+                "properties": {
+                  "idOperacion": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "versionInventario": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Acuse durable con idOperacion, versionInventario y dashboards (idDashboard, estado ACTUALIZADO/SUPERADO, versionDashboard)."
+          },
+          "400": {
+            "description": "Entrada invalida"
+          },
+          "401": {
+            "description": "Credencial invalida"
+          },
+          "403": {
+            "description": "Permisos insuficientes"
+          },
+          "409": {
+            "description": "Operacion o version en conflicto"
+          },
+          "503": {
+            "description": "Fuente no disponible"
+          },
+          "504": {
+            "description": "Timeout"
+          }
+        },
+        "tags": [
+          "Reportes"
+        ]
+      }
+    },
+    "/api/v1/inventario/dashboards": {
+      "post": {
+        "summary": "Crear configuración de dashboard",
+        "tags": [
+          "Dashboards"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "idDashboard": {
+                      "type": "string"
+                    },
+                    "nombre": {
+                      "type": "string"
+                    },
+                    "indicadores": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "filtros": {
+                      "$ref": "#/components/schemas/Filtros"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "filtros": {
+                    "$ref": "#/components/schemas/Filtros"
+                  },
+                  "nombre": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  },
+                  "indicadores": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "totalProductos",
+                        "productosConStock",
+                        "productosSinStock",
+                        "unidadesDisponibles"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "nombre",
+                  "indicadores"
+                ]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Requiere reports:write. No consulta la fuente de stock.",
+        "operationId": "post_api_v1_inventario_dashboards"
+      }
+    },
+    "/api/v1/inventario/reportes/{idReporte}": {
+      "get": {
+        "summary": "Consultar reporte histórico",
+        "tags": [
+          "Reportes"
+        ],
+        "parameters": [
+          {
+            "name": "idReporte",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Requiere reports:read. Devuelve historico=true; no consulta stock.",
+        "operationId": "get_api_v1_inventario_reportes__idReporte_"
+      }
+    },
+    "/health/live": {
+      "get": {
+        "summary": "Estado del proceso",
+        "tags": [
+          "Salud"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "operationId": "get_health_live"
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "summary": "Disponibilidad de SQLite",
+        "tags": [
+          "Salud"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación completada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticación ausente o vencida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permisos insuficientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependencia no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "operationId": "get_health_ready"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Filtros": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "categoria": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "idMayorista": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          }
+        },
+        "required": []
+      },
+      "Producto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "productoId": {
+            "type": "string"
+          },
+          "idMayorista": {
+            "type": "string"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "categoria": {
+            "type": "string"
+          },
+          "stock": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "productoId",
+          "idMayorista",
+          "nombre",
+          "categoria",
+          "stock"
+        ]
+      }
+    }
+  }
+}

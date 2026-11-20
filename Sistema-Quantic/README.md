@@ -70,7 +70,41 @@ cd ..
 
 El comando pide correo y contraseña de al menos 15 caracteres. Esta cuenta permite entrar al inventario y administrar proveedores mediante la integración existente. Las cuentas del otro equipo no vienen en el repositorio. No ejecutar migraciones para una instalación nueva sin datos previos.
 
-## Iniciar el proyecto
+## Inicio facil (una sola terminal)
+
+Despues de completar la primera instalacion, inicia MongoDB y MySQL y cierra las terminales que ejecuten copias anteriores del proyecto.
+
+**Opcion 1:** doble clic en `iniciar-proyecto.cmd`, en la raiz del proyecto.
+
+**Opcion 2:** desde la terminal de VS Code o PowerShell, situada en la raiz:
+
+```powershell
+node scripts/iniciar-proyecto.cjs
+```
+
+El lanzador ejecuta los siete componentes en una terminal, muestra sus mensajes con el nombre del servicio y espera a que sus endpoints respondan. Cuando aparezca `QUANTIC LISTO`, abre http://localhost:5173.
+
+Para detenerlos, pulsa **Ctrl+C** y espera a que termine. Detiene solamente los procesos que inicio este lanzador, incluidos sus procesos auxiliares. No detiene MongoDB ni MySQL. No cierres la ventana a la fuerza.
+
+No necesitas activar el entorno virtual: el lanzador utiliza directamente `audit-service/.venv/Scripts/python.exe`. No instala dependencias, genera claves, cambia configuraciones ni reinicia bases de datos. Al arrancar, los servicios mantienen su comportamiento normal, incluidos recordatorios SMTP y reintentos pendientes.
+
+Si un componente falla, el lanzador detiene los que inicio y muestra el error. Si MySQL no esta conectado y servicios adicionales entra en modo memoria, el inicio se detiene para evitar confundir datos temporales con datos persistidos. Los puertos ocupados se informan sin terminar procesos ajenos. Vite utiliza el puerto 5173 de forma estricta.
+
+Para revisar archivos, dependencias y disponibilidad de puertos sin iniciar servicios:
+
+```powershell
+node scripts/iniciar-proyecto.cjs --check
+```
+
+Esta revision no valida credenciales ni conexiones a bases de datos. Si cambias un `.env`, detén el lanzador y vuelve a iniciarlo. Las URLs entre servicios deben coincidir con los puertos configurados.
+
+Pruebas del lanzador (servidores temporales, sin usar las bases de datos):
+
+```powershell
+node --test scripts/iniciar-proyecto.test.cjs
+```
+
+## Iniciar cada componente manualmente
 
 Mantener MongoDB y MySQL activos. Abrir una terminal por componente y ejecutar desde la carpeta indicada:
 
@@ -127,3 +161,15 @@ Otros contratos y pruebas están descritos en el README de cada componente.
 Cada integrante debe generar su propia configuración local. Antes de subir cambios, revisar `git status` para comprobar que solo se incluyen código, plantillas y documentación. Usar ramas para cada tarea y conservar los package-lock.json. Los `.env` se comparten mediante configuración local, no mediante commits.
 
 Ver `INTEGRACION_SERVICIOS_ADICIONALES.md` para los endpoints y `PENDIENTES.md` para las limitaciones del avance.
+
+## Recuperar la contrasena del administrador
+
+Con MongoDB activo, abre una terminal nueva en `server` y ejecuta:
+
+```powershell
+node scripts/reset-admin-password.js
+```
+
+El comando solicita el correo de un administrador activo y una nueva contrasena de al menos 15 caracteres (maximo 72 bytes), dos veces y sin mostrarla. Actualiza la cuenta existente usando bcrypt y cierra sus sesiones anteriores. No crea usuarios, cambia roles ni reactiva cuentas. Requiere acceso local al proyecto y a su configuracion de base de datos. No compartas la contrasena en capturas ni la pases como argumento de terminal. No es necesario reiniciar el backend.
+## Reportes integrados (S4)
+El lanzador incluye reports-service en el puerto 8004. Como administrador abre Reportes. Consume el stock de mayoristas vigente mediante ESB; ofrece indicadores, filtros y exportaciones JSON, PDF y Excel. Los informes generados se guardan en SQLite. No se importaron cambios de cuentas, carga Excel ni categorías automáticas de HALDOR. No se importó su coordinador de trabajos analíticos: la vista consulta datos vigentes cada 30 segundos. No hay cortes por periodos ni variaciones históricas. Las credenciales se configuran en reports-service/.env, server/.env (REPORTS_INTEGRATION_KEY) e integration-esb/.env (REPORTS_SERVICE_URL).

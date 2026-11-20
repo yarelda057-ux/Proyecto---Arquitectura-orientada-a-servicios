@@ -1,4 +1,5 @@
 import express from 'express';
+import { reportsRouter } from './reports.js';
 import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { config } from './config.js';
 import { additionalServicesRouter } from './additionalServices.js';
@@ -7,6 +8,8 @@ const app = express(); app.disable('x-powered-by'); app.use(express.json({ limit
 app.get('/health/live', (_req,res)=>res.json({status:'ok'}));
 app.use((req,res,next)=>{ const correlationId = req.get('X-Correlation-ID')?.slice(0,100) || randomUUID(); res.set('X-Correlation-ID',correlationId); req.correlationId=correlationId; const supplied=Buffer.from(req.get('X-ESB-Key')||''); const expected=Buffer.from(config.apiKey); if(supplied.length!==expected.length || !timingSafeEqual(supplied,expected)) return res.status(401).json({code:'UNAUTHORIZED',message:'Credenciales de integración inválidas.',correlationId}); next(); });
 app.use('/v1/additional-services', additionalServicesRouter());
+const reporting = reportsRouter();
+app.use(['/v1/reports', '/v1/inventory-source', '/v1/inventory-versions'], (req,res,next)=>{req.url=req.baseUrl.slice('/v1'.length)+req.url;return reporting(req,res,next);});
 const invoke=createSoapClient({url:config.soapUrl,key:config.soapKey,timeoutMs:config.timeoutMs,consumerSystem:config.consumerSystem});
 const routes={ register:'RegisterSupplierSchedule', update:'RegisterSupplierSchedule', catalogUpdated:'ReportCatalogUpdate', cancel:'CancelSupplierSchedule', get:'GetSupplierSchedule' };
 const schemas={ register:['SupplierId','SupplierName','ContactEmail','UpdatePeriodDays','LastCatalogUpdate','AdditionalMessage'], update:['SupplierId','SupplierName','ContactEmail','UpdatePeriodDays','LastCatalogUpdate','AdditionalMessage'], catalogUpdated:['SupplierId','UpdatedAt'], cancel:['SupplierId'], get:['SupplierId'] };
