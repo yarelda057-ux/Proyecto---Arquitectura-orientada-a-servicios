@@ -18,7 +18,7 @@ const sfpSchema = new Schema({
     required: true
   },
   s_n: {
-    type: [String], // Array of strings
+    type: [String],                    
     required: true
   },
   cantidad: {

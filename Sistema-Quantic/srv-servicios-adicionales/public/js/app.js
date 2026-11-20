@@ -1,11 +1,11 @@
-// =============================================================================
-// LÓGICA FRONTEND - DIRECTORIO COMERCIAL
-// Quantic Technology S.A.C. - Directorio de Servicios Adicionales
-// =============================================================================
+                                                                                
+                                         
+                                                                  
+                                                                                
 
 const API_BASE = '/api/v1';
 
-// Estado de la aplicación
+                          
 const state = {
   currentTab: 'catalogo-servicios',
   services: [],
@@ -21,9 +21,9 @@ const state = {
   }
 };
 
-// =============================================================================
-// INICIALIZACIÓN AL CARGAR EL DOM
-// =============================================================================
+                                                                                
+                                  
+                                                                                
 document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
   initSearchAndFilters();
@@ -32,15 +32,15 @@ document.addEventListener('DOMContentLoaded', () => {
   initPortalEmpresa();
   checkHealthAndDB();
 
-  // Cargar datos iniciales
+                           
   cargarCatalogoServicios();
   cargarEmpresas();
   cargarSelectEmpresasParaServicio();
 });
 
-// =============================================================================
-// 1. NAVEGACIÓN ENTRE PESTAÑAS
-// =============================================================================
+                                                                                
+                               
+                                                                                
 function initNavigation() {
   const tabs = document.querySelectorAll('.nav-btn');
   tabs.forEach(tab => {
@@ -54,12 +54,12 @@ function initNavigation() {
 function switchTab(tabId) {
   state.currentTab = tabId;
 
-  // Actualizar botones de navegación
+                                     
   document.querySelectorAll('.nav-btn').forEach(t => {
     t.classList.toggle('active', t.getAttribute('data-tab') === tabId);
   });
 
-  // Alternar paneles de vista
+                              
   document.querySelectorAll('.view-panel').forEach(panel => {
     panel.classList.remove('active');
   });
@@ -69,7 +69,7 @@ function switchTab(tabId) {
     activePanel.classList.add('active');
   }
 
-  // Refrescar datos según la pestaña activa
+                                            
   if (tabId === 'catalogo-servicios') {
     cargarCatalogoServicios();
   } else if (tabId === 'empresas-directorio') {
@@ -85,9 +85,9 @@ function switchTab(tabId) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// =============================================================================
-// 2. DIAGNÓSTICO Y CONEXIÓN DE BASE DE DATOS
-// =============================================================================
+                                                                                
+                                             
+                                                                                
 async function checkHealthAndDB() {
   const badge = document.getElementById('dbStatusBadge');
   const text = document.getElementById('dbStatusText');
@@ -111,9 +111,9 @@ async function checkHealthAndDB() {
   }
 }
 
-// =============================================================================
-// 3. CÁPSULA DE BÚSQUEDA Y FILTRADO
-// =============================================================================
+                                                                                
+                                    
+                                                                                
 function initSearchAndFilters() {
   const searchInput = document.getElementById('searchQuery');
   const btnClearSearch = document.getElementById('btnClearSearch');
@@ -123,7 +123,7 @@ function initSearchAndFilters() {
   const btnExecute = document.getElementById('btnExecuteSearch');
   const btnReset = document.getElementById('btnResetFilters');
 
-  // Búsqueda en vivo fluida
+                            
   let debounceTimer;
   searchInput.addEventListener('input', (e) => {
     const val = e.target.value.trim();
@@ -167,7 +167,7 @@ function initSearchAndFilters() {
 
   btnReset.addEventListener('click', resetCatalogFilters);
 
-  // Tarjetas de categoría rápida (Estilo ClassiAds)
+                                                    
   document.querySelectorAll('.cat-pill-card').forEach(card => {
     card.addEventListener('click', () => {
       const cat = card.getAttribute('data-cat');
@@ -310,9 +310,9 @@ function renderizarServicios(servicios) {
   }).join('');
 }
 
-// =============================================================================
-// 4. DIRECTORIO DE EMPRESAS VERIFICADAS
-// =============================================================================
+                                                                                
+                                        
+                                                                                
 async function cargarEmpresas() {
   const grid = document.getElementById('empresasGrid');
   const emptyState = document.getElementById('emptyEmpresasState');
@@ -396,11 +396,11 @@ async function cargarSelectEmpresasParaServicio() {
   }
 }
 
-// =============================================================================
-// 5. FORMULARIOS DE REGISTRO
-// =============================================================================
+                                                                                
+                             
+                                                                                
 function initForms() {
-  // 1. Registro de Empresa
+                           
   const formEmpresa = document.getElementById('formRegistroEmpresa');
   formEmpresa.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -414,7 +414,7 @@ function initForms() {
     const sitio_web = document.getElementById('empSitioWeb').value.trim();
     const descripcion = document.getElementById('empDescripcion').value.trim();
 
-    // Servicio inicial adjunto opcional
+                                        
     const srvNombre = document.getElementById('srvNombreIni').value.trim();
     const srvCategoria = document.getElementById('srvCategoriaIni').value;
     const srvTipo = document.getElementById('srvTipoIni').value;
@@ -478,7 +478,7 @@ function initForms() {
     }
   });
 
-  // 2. Registro de Servicio Adicional
+                                      
   const formServicio = document.getElementById('formRegistroServicio');
   formServicio.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -533,9 +533,9 @@ function initForms() {
   });
 }
 
-// =============================================================================
-// 6. PANEL DE DEMOSTRACIÓN ADMINISTRATIVA
-// =============================================================================
+                                                                                
+                                          
+                                                                                
 function initAdminPanel() {
   document.querySelectorAll('.admin-pill-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -754,9 +754,9 @@ async function cambiarEstadoServicio(id, nuevoEstado) {
   }
 }
 
-// =============================================================================
-// 6.5. PORTAL DE EMPRESAS PROVEEDORAS (AUTOGESTIÓN COMERCIAL)
-// =============================================================================
+                                                                                
+                                                              
+                                                                                
 function initPortalEmpresa() {
   const formAcceso = document.getElementById('formAccesoPortal');
   if (formAcceso) {
@@ -1105,9 +1105,9 @@ async function guardarCambiosServicio(e) {
   }
 }
 
-// =============================================================================
-// 7. MODAL DETALLE DE EMPRESA
-// =============================================================================
+                                                                                
+                              
+                                                                                
 async function verDetalleEmpresa(empresaId) {
   try {
     const res = await fetch(`${API_BASE}/catalogo/empresas/${empresaId}`);
@@ -1173,9 +1173,9 @@ window.addEventListener('click', (e) => {
   }
 });
 
-// =============================================================================
-// 8. NOTIFICACIONES TOAST
-// =============================================================================
+                                                                                
+                          
+                                                                                
 function mostrarToast(mensaje, tipo = 'info') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');

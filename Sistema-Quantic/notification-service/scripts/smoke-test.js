@@ -37,7 +37,7 @@ async function waitForHealth(baseUrl, output) {
     try {
       const response = await fetch(`${baseUrl}/health/ready`, { signal: AbortSignal.timeout(1000) });
       if (response.ok) return;
-    } catch { /* el servidor todavía está iniciando */ }
+    } catch {                                          }
     await delay(250);
   }
   throw new Error(`El servicio no quedó listo en 15 segundos.\n${output()}`);

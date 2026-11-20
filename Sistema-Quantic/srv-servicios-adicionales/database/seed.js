@@ -1,7 +1,7 @@
-// =============================================================================
-// SCRIPT DE POBLADO DE DATOS INICIALES (DEMO) EN MYSQL
-// Microservicio: SRV-G5202605 - Quantic Technology S.A.C.
-// =============================================================================
+                                                                                
+                                                       
+                                                          
+                                                                                
 
 const db = require('../src/config/db');
 
@@ -13,7 +13,7 @@ async function seedDatabase() {
     process.exit(1);
   }
 
-  // 1. Semillas de Empresas
+                            
   const sqlEmpresas = `
     INSERT INTO empresas (id, razon_social, ruc, email_contacto, telefono, sitio_web, direccion, ciudad, descripcion, estado_verificacion, fecha_revision, notas_revision)
     VALUES 
@@ -25,7 +25,7 @@ async function seedDatabase() {
     ON DUPLICATE KEY UPDATE razon_social = VALUES(razon_social);
   `;
 
-  // 2. Semillas de Servicios
+                             
   const sqlServicios = `
     INSERT INTO servicios (id, empresa_id, nombre, descripcion, categoria, tipo_servicio, precio_referencial, estado)
     VALUES

@@ -1,5 +1,5 @@
 process.env.AUDIT_ENABLED = 'false';
-// Servidor temporal de revisión visual; nunca usa la base de inventario.
+                                                                         
 import { randomBytes } from 'node:crypto';
 import mongoose from 'mongoose';
 import { createApp } from '../app.js';

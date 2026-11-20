@@ -5,8 +5,8 @@ import { Writable } from 'node:stream';
 import User from '../models/user.js';
 import Session from '../models/session.js';
 
-// Recuperacion local: requiere acceso al equipo y a la configuracion de MongoDB.
-// No se expone como endpoint ni recibe contrasenas mediante argumentos.
+                                                                                 
+                                                                        
 if (!process.stdin.isTTY) {
   console.error('Ejecuta este comando directamente en una terminal interactiva.');
   process.exit(1);
@@ -40,7 +40,7 @@ try {
   const confirmation = await secret('Repite la nueva contrasena: ');
   if (password !== confirmation) throw new Error('Las contrasenas no coinciden. No se realizaron cambios.');
   if (await user.comparePassword(password)) throw new Error('Elige una contrasena diferente a la anterior.');
-  // save ejecuta el hash bcrypt del modelo; nunca guardar texto plano con updateOne.
+                                                                                     
   user.password = password;
   await user.save();
   changed = true;

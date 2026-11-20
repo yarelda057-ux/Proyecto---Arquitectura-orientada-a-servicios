@@ -1,26 +1,26 @@
-// =============================================================================
-// CONTROLADOR DE ADMINISTRACIÓN Y CONTROL DE CATÁLOGO
-// Quantic Technology S.A.C.
-// AVISO IMPORTANTE:
-// Este controlador permite la revisión, aprobación, rechazo e inhabilitación
-// de empresas y servicios para el control operativo del catálogo comercial.
-// =============================================================================
+                                                                                
+                                                      
+                            
+                    
+                                                                             
+                                                                            
+                                                                                
 
 const EmpresaModel = require('../models/empresaModel');
 const ServicioModel = require('../models/servicioModel');
 
 class AdminDemoController {
-  /**
-   * GET /api/v1/demo-admin/solicitudes
-   * Retorna el listado completo de solicitudes y empresas con sus servicios asociados,
-   * permitiendo filtrar por estado ('PENDIENTE', 'APROBADO', 'INACTIVO', 'RECHAZADO').
-   */
+     
+                                       
+                                                                                       
+                                                                                       
+     
   static async listarSolicitudes(req, res) {
     try {
       const { estado } = req.query;
       const empresas = await EmpresaModel.getTodasLasSolicitudes({ estado });
 
-      // Cargar los servicios vinculados a cada empresa para visualización completa
+                                                                                   
       const solicitudesCompletas = await Promise.all(
         empresas.map(async (empresa) => {
           const servicios = await ServicioModel.getByEmpresaId(empresa.id, false);
@@ -48,11 +48,11 @@ class AdminDemoController {
     }
   }
 
-  /**
-   * PATCH /api/v1/demo-admin/empresas/:id/estado
-   * Aprueba, rechaza o inhabilita una empresa proveedora.
-   * Body: { estado: 'APROBADO' | 'RECHAZADO' | 'PENDIENTE' | 'INACTIVO', notas: '...', aprobar_servicios: true }
-   */
+     
+                                                 
+                                                          
+                                                                                                                 
+     
   static async actualizarEstadoEmpresa(req, res) {
     try {
       const { id } = req.params;
@@ -76,14 +76,14 @@ class AdminDemoController {
         });
       }
 
-      // Actualizar estado de la empresa
+                                        
       const empresaActualizada = await EmpresaModel.updateEstado(
         id,
         estado,
         notas || `Actualización en consola administrativa (${new Date().toLocaleDateString('es-PE')})`
       );
 
-      // Si la empresa se inhabilita, inhabilitar en cascada sus servicios asociados
+                                                                                    
       if (estado === 'INACTIVO') {
         await ServicioModel.updateEstadoPorEmpresa(id, 'INACTIVO');
       } else if (estado === 'APROBADO' && aprobar_servicios !== false) {
@@ -115,11 +115,11 @@ class AdminDemoController {
     }
   }
 
-  /**
-   * PATCH /api/v1/demo-admin/servicios/:id/estado
-   * Aprueba, rechaza o inhabilita individualmente un servicio.
-   * Body: { estado: 'APROBADO' | 'RECHAZADO' | 'PENDIENTE' | 'INACTIVO' }
-   */
+     
+                                                  
+                                                               
+                                                                          
+     
   static async actualizarEstadoServicio(req, res) {
     try {
       const { id } = req.params;

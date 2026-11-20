@@ -8,8 +8,6 @@ body{margin:0;background:#f3f6f7;color:var(--ink);font-family:Inter,Segoe UI,sys
 .audit-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.audit-path{max-width:360px;overflow-wrap:anywhere}.audit-path small{font-size:.65rem}@media(max-width:700px){.audit-filters{grid-template-columns:1fr}.topbar nav{flex-wrap:wrap}}
 .supplier-table td{vertical-align:middle}.stat-text{font-size:1rem;line-height:1.5;overflow-wrap:anywhere}.upload-panel{max-width:920px}.batch-panel{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:1.5rem}.batch-panel h2{margin:.35rem 0}@media(max-width:700px){.batch-panel{align-items:start;flex-direction:column}}
 .access-check{display:flex;align-items:center;gap:.55rem;font-size:.9rem}.access-check input{width:1rem;height:1rem}
-
-/* Vista previa de archivos: ventana y hoja de cálculo. */
 .stock-preview .modal-dialog{max-width:1180px;margin-left:auto;margin-right:auto;width:calc(100% - 2rem)}
 .stock-preview .modal-content{overflow:hidden;box-shadow:0 28px 100px #102e3960;border:1px solid #dbe8e3;border-radius:20px}
 .stock-preview .modal-header{background:linear-gradient(120deg,#f1faf5,#fff);align-items:flex-start;border-bottom:1px solid #dce8e2;padding:1.5rem}

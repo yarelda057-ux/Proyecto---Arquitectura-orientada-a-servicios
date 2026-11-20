@@ -14,4 +14,4 @@ request = Request(url + "/v1/events", data=json.dumps(event).encode(), method="P
                   headers={"Content-Type": "application/json", "Authorization": "Bearer " + key})
 with urlopen(request, timeout=5) as response:
     print(response.status, response.read().decode())
-# Para reintentar conservar el mismo event_id y contenido; no regenerar el evento.
+                                                                                  

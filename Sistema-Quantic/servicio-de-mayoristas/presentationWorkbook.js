@@ -1,6 +1,6 @@
 import ExcelJS from 'exceljs';
 
-// La primera hoja conserva las cuatro columnas de importación.
+                                                               
 export async function presentationWorkbook(batch) {
   const book = new ExcelJS.Workbook();
   book.creator = 'Servicio de Gestión de Stock de Mayoristas';

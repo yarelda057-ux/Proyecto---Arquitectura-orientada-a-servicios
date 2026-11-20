@@ -24,7 +24,7 @@ export function createReportsRouter({ authenticate = validateAuth, fetchImpl = f
       let body = req.body;
       if ((req.method === 'POST' && req.path === '/reportes' && (!body?.periodo || body.periodo.tipo === 'actual')) || (req.method === 'PUT' && req.path.startsWith('/dashboards/'))) {
         if (!body || typeof body !== 'object' || Array.isArray(body)) return res.status(400).json({ message: 'Cuerpo inválido.' });
-        // El coordinador obtiene una versión confirmada antes de componer S2 con S4.
+                                                                                     
         const source = await fetchImpl(new URL('/v1/inventory-source', base), { redirect: 'error', signal: AbortSignal.timeout(30000), headers: { 'X-ESB-Key': esbKey, Authorization: stockAuthorization, 'X-Correlation-ID': correlationId } });
         const snapshot = await source.json();
         if (!source.ok) return res.status(source.status).json(snapshot);

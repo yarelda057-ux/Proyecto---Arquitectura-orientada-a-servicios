@@ -1,6 +1,6 @@
-// Ejemplo para otro sistema. Ejecutar con SERVICE_URL, SERVICE_EMAIL,
-// SERVICE_PASSWORD y SUPPLIER_ID en variables de entorno; archivo como argumento.
-// node examples/upload.mjs stock.xlsx
+                                                                      
+                                                                                  
+                                      
 import { readFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 const base = process.env.SERVICE_URL || 'http://localhost:3001';

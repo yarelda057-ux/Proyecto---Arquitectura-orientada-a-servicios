@@ -1,7 +1,7 @@
-// =============================================================================
-// PUNTO DE ENTRADA DEL SERVIDOR
-// Microservicio: SRV-G5202605 - Quantic Technology S.A.C.
-// =============================================================================
+                                                                                
+                                
+                                                          
+                                                                                
 
 require('dotenv').config();
 const app = require('./app');
@@ -16,7 +16,7 @@ async function iniciarServidor() {
   console.log(' Proveedor: Quantic Technology S.A.C.');
   console.log('------------------------------------------------------------');
 
-  // Verificar disponibilidad de MySQL
+                                      
   await db.checkDatabaseConnection();
 
   app.listen(PORT, () => {

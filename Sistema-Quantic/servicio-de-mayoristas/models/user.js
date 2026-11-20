@@ -8,7 +8,7 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: true,
-      unique: true, // Asegura que el correo electrónico sea único
+      unique: true,                                               
       trim: true,
       lowercase: true,
     },
@@ -16,17 +16,17 @@ const userSchema = new Schema(
       type: String,
       required: true,
       minlength: 15,
-      select: false, // Longitud mínima para la contraseña
+      select: false,                                      
     },
-    // Puedes añadir otros campos como 'role', 'isActive', etc.
+                                                               
     isActive: { type: Boolean, default: true },
     role: {
       type: String,
       enum: ['user', 'admin', 'mayorista'],
       default: 'user',
     },
-    // Solo los usuarios mayoristas quedan ligados a un proveedor concreto.
-    // Se guarda el ID público (MAY-xxxxxx), no un ObjectId interno.
+                                                                           
+                                                                    
     supplierId: {
       type: String,
       trim: true,
@@ -36,11 +36,11 @@ const userSchema = new Schema(
     },
   },
   {
-    timestamps: true, // Agrega automáticamente los campos 'createdAt' y 'updatedAt'
+    timestamps: true,                                                               
   }
 );
 
-// Middleware para encriptar la contraseña antes de guardar el usuario
+                                                                      
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
@@ -51,7 +51,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// Método para comparar la contraseña ingresada con la encriptada
+                                                                 
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };

@@ -34,7 +34,7 @@ router.post('/login', loginLimiter(), async (req, res) => {
   const exp = Math.floor(Date.now() / 1000) + config.sessionSeconds;
   await Session.create({ _id: jti, userId: user._id, expiresAt: new Date(exp * 1000) });
   let old;
-  try { old = verifyToken(req.cookies?.[cookieName()]); } catch { /* No sesión anterior válida. */ }
+  try { old = verifyToken(req.cookies?.[cookieName()]); } catch {                                  }
   if (old) await Session.deleteOne({ _id: old.jti });
   const token = jwt.sign({ exp }, config.secret, { algorithm: 'HS256', subject: String(user._id), jwtid: jti, issuer: config.issuer, audience: config.audience });
   res.clearCookie(wholesaleCookie(), cookieOptions());
@@ -42,7 +42,7 @@ router.post('/login', loginLimiter(), async (req, res) => {
   req.user = user;
   res.json(profile(user, exp));
 });
-// Inventario privado: únicamente administradores pueden crear cuentas.
+                                                                       
 router.post('/register', validateAuth, requireAdmin, async (req, res) => {
   const { email, password } = req.body || {};
   if (typeof email !== 'string' || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || typeof password !== 'string' || [...password].length < 15 || Buffer.byteLength(password) > 72) return res.status(400).json({ message: 'Correo válido y contraseña de al menos 15 caracteres (máximo 72 bytes) requeridos.' });
@@ -56,7 +56,7 @@ router.post('/logout', async (req, res) => {
     res.clearCookie(wholesaleCookie(), cookieOptions());
   }
   let claims;
-  try { claims = verifyToken(req.cookies?.[cookieName()]); } catch { /* Cierre idempotente. */ }
+  try { claims = verifyToken(req.cookies?.[cookieName()]); } catch {                           }
   if (claims) {
     const result = await Session.deleteOne({ _id: claims.jti });
     if (result.deletedCount) req.auditActorId = claims.sub;

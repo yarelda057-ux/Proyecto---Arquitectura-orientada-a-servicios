@@ -1,7 +1,7 @@
-// =============================================================================
-// CONFIGURACIÓN PRINCIPAL DE LA APLICACIÓN EXPRESS
-// Microservicio: SRV-G5202605 - Quantic Technology S.A.C.
-// =============================================================================
+                                                                                
+                                                   
+                                                          
+                                                                                
 
 const express = require('express');
 const cors = require('cors');
@@ -14,15 +14,15 @@ const adminDemoRoutes = require('./routes/adminDemoRoutes');
 
 const app = express();
 
-// Middlewares globales
+                       
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Servir frontend estático (HTML, CSS, JS)
+                                           
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Endpoint de diagnóstico y salud del microservicio
+                                                    
 app.get('/api/v1/salud', (req, res) => {
   res.status(200).json({
     servicio: 'Servicio de Consulta de Servicios Adicionales',
@@ -41,14 +41,14 @@ app.get('/api/v1/salud', (req, res) => {
   });
 });
 
-// Rutas de la API REST del Catálogo
+                                    
 app.use('/api/v1/catalogo/empresas', empresasRoutes);
 app.use('/api/v1/catalogo/servicios', serviciosRoutes);
 
-// Rutas de Demostración Administrativa (Aprobación/Rechazo)
+                                                            
 app.use('/api/v1/demo-admin', adminDemoRoutes);
 
-// Manejo de rutas API no encontradas (404)
+                                           
 app.use('/api/*', (req, res) => {
   res.status(404).json({
     status: 'error',
@@ -57,12 +57,12 @@ app.use('/api/*', (req, res) => {
   });
 });
 
-// Redirigir cualquier otra petición a la interfaz web principal
+                                                                
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-// Manejador global de errores no controlados
+                                             
 app.use((err, req, res, next) => {
   console.error('[Error de Aplicación]:', err);
   res.status(500).json({

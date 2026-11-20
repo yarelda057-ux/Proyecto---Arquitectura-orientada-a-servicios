@@ -18,7 +18,7 @@ export async function deliverBatch({ Model = AuditOutbox, send = sendAuditEvent,
     try {
       const response = await send(job.event);
       status = response.status;
-      // Leer el acuse: un proxy que devuelva HTML/200 no confirma recepción.
+                                                                             
       if (response.ok) {
         const receipt = await response.json();
         if (receipt.event_id === job.event.event_id && typeof receipt.id === 'string') {
@@ -27,7 +27,7 @@ export async function deliverBatch({ Model = AuditOutbox, send = sendAuditEvent,
         }
         status = 0;
       }
-    } catch { /* Reintentar sin imprimir claves ni contenido. */ }
+    } catch {                                                    }
     const permanent = status >= 400 && status < 500 && ![408, 429].includes(status);
     await Model.updateOne({ _id: job._id, leaseToken }, { $inc: { attempts: 1 }, $set: {
       state: permanent ? 'failed' : 'pending', lastStatus: status,

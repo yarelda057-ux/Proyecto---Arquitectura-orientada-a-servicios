@@ -26,7 +26,7 @@ function token(issuer = 'inventory', changes = {}) {
 async function setup(t, source = async ({ expected }) => validateSnapshot(fixture, expected)) {
   const repository = new Repository(':memory:', Object.keys(clients));
   const handler = createHandler({ repository, clients, source });
-  // El modo HTTP real es optativo para entornos que permiten sockets locales.
+                                                                              
   const server = process.env.REPORTS_HTTP_TESTS === 'true' ? createServer(handler) : null;
   if (server) await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   t.after(async () => { if (server) await new Promise(resolve => server.close(resolve)); repository.close(); });

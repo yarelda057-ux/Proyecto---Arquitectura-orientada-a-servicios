@@ -23,7 +23,7 @@ export function additionalServicesRouter() {
       if (!response.ok) throw fail(503, 'El servicio de servicios adicionales no está disponible. Inténtalo nuevamente.');
       const result = await response.json();
       if (result.status !== 'success' || (!id && !Array.isArray(result.datos)) || (id && (!result.datos || typeof result.datos !== 'object' || Array.isArray(result.datos)))) throw fail(502, 'El servicio devolvió una respuesta inesperada.');
-      // El proveedor no comprueba el estado de la empresa en su endpoint de detalle de servicio.
+                                                                                                 
       if (id && resource === 'servicios' && (result.datos.estado !== 'APROBADO' || result.datos.empresa?.estado_verificacion !== 'APROBADO')) throw fail(404, 'El registro no está disponible en el catálogo.');
       if (id && resource === 'empresas' && result.datos.estado_verificacion !== 'APROBADO') throw fail(404, 'El registro no está disponible en el catálogo.');
       res.set('Cache-Control', 'no-store').json({ ...result, correlationId: req.correlationId });

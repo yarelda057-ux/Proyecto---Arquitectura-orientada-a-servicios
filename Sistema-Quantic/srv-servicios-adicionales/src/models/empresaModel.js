@@ -1,11 +1,11 @@
-// =============================================================================
-// MODELO / REPOSITORIO DE EMPRESAS
-// Microservicio: SRV-G5202605 - Quantic Technology S.A.C.
-// =============================================================================
+                                                                                
+                                   
+                                                          
+                                                                                
 
 const db = require('../config/db');
 
-// Datos de demostración en memoria para cuando MySQL aún no está configurado
+                                                                             
 let memoriaEmpresas = [
   {
     id: 1,
@@ -87,7 +87,7 @@ let memoriaEmpresas = [
 let nextEmpresaId = 6;
 
 class EmpresaModel {
-  // Crear una nueva empresa (Siempre nace con estado 'PENDIENTE')
+                                                                  
   static async create({ razon_social, ruc, email_contacto, telefono, sitio_web, direccion, ciudad, descripcion }) {
     if (db.isMySQLConnected()) {
       const sql = `
@@ -118,7 +118,7 @@ class EmpresaModel {
       };
     }
 
-    // Modo Demostración en memoria
+                                   
     const nuevaEmpresa = {
       id: nextEmpresaId++,
       razon_social,
@@ -138,7 +138,7 @@ class EmpresaModel {
     return nuevaEmpresa;
   }
 
-  // Obtener solo empresas aprobadas para el directorio público
+                                                               
   static async getAprobadas({ q, ciudad } = {}) {
     if (db.isMySQLConnected()) {
       let sql = `
@@ -164,7 +164,7 @@ class EmpresaModel {
       return await db.query(sql, params);
     }
 
-    // Modo Memoria
+                   
     const normalize = (str) => (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
     return memoriaEmpresas
@@ -181,7 +181,7 @@ class EmpresaModel {
       });
   }
 
-  // Obtener una empresa por ID
+                               
   static async getById(id) {
     if (db.isMySQLConnected()) {
       const rows = await db.query(`SELECT * FROM empresas WHERE id = ?`, [id]);
@@ -191,7 +191,7 @@ class EmpresaModel {
     return memoriaEmpresas.find(e => e.id === parseInt(id, 10)) || null;
   }
 
-  // Obtener empresa por RUC (para evitar duplicados)
+                                                     
   static async getByRuc(ruc) {
     if (db.isMySQLConnected()) {
       const rows = await db.query(`SELECT * FROM empresas WHERE ruc = ?`, [ruc]);
@@ -201,7 +201,7 @@ class EmpresaModel {
     return memoriaEmpresas.find(e => e.ruc === ruc) || null;
   }
 
-  // Obtener todas las solicitudes (incluye PENDIENTES, APROBADAS, RECHAZADAS) - Para demostración de administración
+                                                                                                                    
   static async getTodasLasSolicitudes({ estado } = {}) {
     if (db.isMySQLConnected()) {
       let sql = `SELECT * FROM empresas`;
@@ -221,7 +221,7 @@ class EmpresaModel {
     return resultado.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }
 
-  // Actualizar estado de verificación (Aprobación / Rechazo)
+                                                             
   static async updateEstado(id, nuevoEstado, notas = '') {
     const fecha = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
@@ -242,7 +242,7 @@ class EmpresaModel {
     return memoriaEmpresas[index];
   }
 
-  // Actualizar datos comerciales de la empresa (para autogestión de la empresa)
+                                                                                
   static async updateDatos(id, { telefono, direccion, ciudad, sitio_web, descripcion }) {
     if (db.isMySQLConnected()) {
       await db.query(

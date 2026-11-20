@@ -82,14 +82,14 @@ try {
       }
     }
   });
-  // No mostrar stderr completo: los errores de transporte pueden contener credenciales.
+                                                                                        
   child.stderr.on('data', () => {});
   const healthDeadline = Date.now() + 20000;
   let ready = false;
   while (Date.now() < healthDeadline) {
     if (startError) throw new Error(`No se pudo iniciar el proceso: ${startError}`);
     checkRunning();
-    try { ready = (await fetch(`${baseUrl}/health/ready`, { signal: AbortSignal.timeout(1000) })).ok; } catch { /* Inicio en curso. */ }
+    try { ready = (await fetch(`${baseUrl}/health/ready`, { signal: AbortSignal.timeout(1000) })).ok; } catch {                        }
     if (ready) break;
     await delay(250);
   }
@@ -117,7 +117,7 @@ try {
     await delay(500);
   }
   if (sent.size !== 3) throw new Error(`Solo se confirmaron ${sent.size} de 3 avisos en 90 segundos. Revisa la configuración SMTP; no repitas la prueba sin comprobar qué correos llegaron.`);
-  // Esperar otro ciclo del worker para detectar repeticiones inmediatas.
+                                                                         
   await delay(6000);
   if ([...sent.values()].some(count => count !== 1)) throw new Error('Se detectó un aviso repetido durante la prueba.');
   console.log(preview ? 'OK: los tres avisos se generaron sin repetirse en el siguiente ciclo.' : 'OK: SMTP aceptó los tres avisos. Comprueba tu bandeja de entrada y spam; la aceptación SMTP no confirma la entrega.');

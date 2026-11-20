@@ -42,7 +42,7 @@ try {
   console.log('PASS: MongoDB real, login, CRUD equipos/SFP, duplicados, registro y revocación.');
 } finally {
   if (server) { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
-  // Eliminar únicamente la base temporal creada por esta ejecución.
+                                                                    
   if (mongoose.connection.name === dbName && dbName.startsWith('quantic_test_')) await mongoose.connection.dropDatabase();
   await mongoose.disconnect();
 }

@@ -1,4 +1,4 @@
-// Configuración de desarrollo para una copia nueva. No imprime secretos.
+                                                                         
 const fs = require('node:fs');
 const path = require('node:path');
 const { randomBytes, createHash } = require('node:crypto');
@@ -21,7 +21,7 @@ const overrides = {
   'srv-servicios-adicionales': { PORT: '3002' },
   'audit-service': {}, 'vite-project': {}, 'reports-service': { REPORTS_CLIENTS_JSON: JSON.stringify({ 'inventory-gateway': { secret: reports, scopes: ['reports:read', 'reports:write'] } }), SOURCE_ESB_KEY: esb },
 };
-// Leer y preparar todo antes de escribir para detectar plantillas faltantes.
+                                                                             
 const files = services.map(name => {
   let content = fs.readFileSync(path.join(root, name, '.env.example'), 'utf8');
   for (const [key, value] of Object.entries(overrides[name])) {

@@ -5,7 +5,7 @@ const date = d => new Date(d).toLocaleString('es-PE', { timeZone: 'America/Lima'
 const filtersText = r => Object.entries(r.filtros).map(([k,v]) => k + ': ' + (Array.isArray(v) ? v.join(', ') || 'Todos' : v)).join(' | ') || 'Todas las categorias y todos los mayoristas';
 const periodText = r => r.periodo.tipo === 'actual' ? 'Inventario actual' : r.periodo.desde + ' a ' + r.periodo.hasta + ' (America/Lima)';
 
-// Small vector PDF renderer: no browser, external assets or platform fonts required.
+                                                                                     
 export function pdfFile(r) {
   if (r.datos.length > 10000) throw fail(413, 'Para PDF con detalle, reduce la seleccion a 10000 productos o descarga Excel.');
   const pages = []; let commands = [], y = 0;

@@ -1,4 +1,4 @@
-// Lanzador local: sin dependencias nuevas y sin modificar configuracion o datos.
+                                                                                 
 const fs = require('node:fs');
 const path = require('node:path');
 const net = require('node:net');
@@ -33,7 +33,7 @@ function configuration(root) {
     const cwd = path.join(root, name);
     const envPath = path.join(cwd, '.env');
     if (!fs.existsSync(envPath)) throw new Error(`Falta ${name}/.env. Completa la primera instalacion del README.`);
-    // Se preserva la prioridad de variables de la terminal sobre dotenv.
+                                                                         
     const env = { ...parse(fs.readFileSync(envPath)), ...process.env, PYTHONUNBUFFERED: '1' };
     const isPython = name === 'audit-service';
     const isVite = name === 'vite-project';
@@ -110,7 +110,7 @@ class Supervisor {
     this.stopPromise = Promise.all(this.children.map(child => new Promise(resolve => {
       if (!child.pid || child.exitCode !== null || child.signalCode !== null) return resolve();
       if (process.platform === 'win32') {
-        // Solo procesos creados por esta instancia; incluye el ayudante de Vite.
+                                                                                 
         const killer = spawn('taskkill.exe', ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true, stdio: 'ignore' });
         const fallback = () => {
           if (child.exitCode !== null || child.signalCode !== null) return resolve();

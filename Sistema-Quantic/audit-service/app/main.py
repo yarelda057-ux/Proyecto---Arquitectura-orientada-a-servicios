@@ -84,7 +84,7 @@ def create_app(settings=None, repository=None):
         start = monotonic()
         response = await call_next(request)
         response.headers.update({"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer", "X-Frame-Options": "DENY"})
-        # No query, cuerpo, cabeceras, claves ni mensajes de excepciones.
+                                                                         
         logger.info(json.dumps({"method": request.method, "path": request.url.path,
                                "client": getattr(request.state, "client_id", None), "status": response.status_code,
                                "duration_ms": int((monotonic() - start) * 1000)}))

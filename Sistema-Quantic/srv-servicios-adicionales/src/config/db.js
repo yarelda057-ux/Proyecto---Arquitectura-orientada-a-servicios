@@ -1,7 +1,7 @@
-// =============================================================================
-// CONFIGURACIÓN DE CONEXIÓN A BASE DE DATOS (MySQL)
-// Microservicio: SRV-G5202605 - Quantic Technology S.A.C.
-// =============================================================================
+                                                                                
+                                                    
+                                                          
+                                                                                
 
 const mysql = require('mysql2/promise');
 require('dotenv').config();
@@ -20,7 +20,7 @@ const dbConfig = {
 let pool = null;
 let isConnected = false;
 
-// Inicializa el pool y comprueba la conectividad de forma no bloqueante
+                                                                        
 async function checkDatabaseConnection() {
   try {
     pool = mysql.createPool(dbConfig);
@@ -42,7 +42,7 @@ async function checkDatabaseConnection() {
   }
 }
 
-// Ejecuta consultas SQL en el pool si está disponible
+                                                      
 async function query(sql, params = []) {
   if (!isConnected || !pool) {
     throw new Error('MySQL no está conectado');

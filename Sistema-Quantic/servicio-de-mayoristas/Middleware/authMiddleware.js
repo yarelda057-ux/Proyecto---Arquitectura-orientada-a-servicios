@@ -12,7 +12,7 @@ export default async function validateAuth(req, res, next) {
     } catch (err) {
       if (!c.integrationKey) throw err;
       claims = jwt.verify(token, c.integrationKey, { algorithms: ['HS256'], issuer: 'inventory-gateway', audience: 'wholesale-api', maxAge: '60s' });
-      // La pasarela solo delega usuarios internos; mayoristas usan sesiones propias.
+                                                                                     
       if (!['admin', 'user'].includes(claims.role) || !/^[a-f0-9]{24}$/i.test(claims.sub)) throw err;
       req.user = { _id: claims.sub, role: claims.role, email: claims.email };
       req.session = claims;

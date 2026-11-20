@@ -6,7 +6,7 @@ export function auditMiddleware(sink = enqueueAudit) {
     const requestId = randomUUID();
     const start = performance.now();
     const occurredAt = new Date().toISOString();
-    // Nunca copiar query, cuerpo, tokens, cookies o contraseñas.
+                                                                 
     const path = req.originalUrl.split('?')[0].split('#')[0].replace(/[\x00-\x1f\x7f]/g, '').slice(0, 1024) || '/';
     res.set('X-Request-ID', requestId);
     let sent = false;

@@ -55,7 +55,7 @@ export default function SfpProvider({ children }) {
   const fetchLogin = async credentials => { generation.current++; const data = await loginUser(credentials); accept(data); };
   const fetchLogout = async () => {
     await logoutUser(); clear();
-    try { localStorage.setItem('quantic-logout', String(Date.now())); } catch { /* Almacenamiento bloqueado. */ }
+    try { localStorage.setItem('quantic-logout', String(Date.now())); } catch {                                 }
   };
   return <SfpContext.Provider value={{ user, remaining, loading, authError, notice, fetchProfile, fetchLogin, fetchLogout }}>{children}</SfpContext.Provider>;
 }

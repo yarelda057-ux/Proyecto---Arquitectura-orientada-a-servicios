@@ -59,14 +59,14 @@ try {
   assert.equal((await request('/devices/allDevices?password=do-not-record')).status, 200);
   await eventually(async () => await AuditOutbox.countDocuments() === 2);
   const first = await AuditOutbox.findOne({ 'event.path': '/api/users/login' }).lean();
-  // Caída temporal simulada en transporte: conservar y reintentar el evento persistido.
+                                                                                        
   await deliverBatch({ limit: 1, send: async () => { throw new Error('Simulated outage'); } });
   assert.equal(await AuditOutbox.countDocuments(), 2);
   assert.equal(await AuditOutbox.countDocuments({ attempts: 1 }), 1);
   await AuditOutbox.updateMany({}, { $set: { nextAttemptAt: new Date(0) } });
   await deliverBatch();
   assert.equal(await AuditOutbox.countDocuments(), 0);
-  // Acuse perdido: reenviar el mismo evento no debe duplicarlo.
+                                                                
   const duplicate = await sendAuditEvent(first.event); assert.equal(duplicate.status, 200);
   response = await request('/audit/events'); assert.equal(response.status, 200);
   const result = await response.json();

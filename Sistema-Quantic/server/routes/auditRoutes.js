@@ -17,7 +17,7 @@ router.get('/events', async (req, res) => {
       try {
         const response = await wholesaleRequest('/api/v1/auth/users?ids=' + encodeURIComponent(missingIds.join(',')), { token: delegationToken(req.user) });
         if (response.ok) users.push(...(await response.json()).users);
-      } catch { /* Mantener consulta de auditoría disponible. */ }
+      } catch {                                                  }
     }
     const identities = new Map(users.map(user => [String(user._id), user]));
     res.json({ ...page, items: page.items.map(event => ({ ...event, actor_email: identities.get(event.actor_id)?.email || null, actor_role: identities.get(event.actor_id)?.role || null })) });

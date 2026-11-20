@@ -18,8 +18,8 @@ export function createApp({ auditSink } = {}) {
   app.use(securityHeaders, auditMiddleware(auditSink));
   app.use(cors({ origin: config.origins, credentials: true }));
   app.use(protectWrites(config.origins));
-  // Solo el contrato de carga necesita un cuerpo amplio porque el XLSX viaja
-  // como Base64. El resto de la API conserva el límite pequeño por seguridad.
+                                                                             
+                                                                              
   app.use(cookieParser());
   app.use('/api/v1/stock', express.json({ limit: '14mb' }), wholesaleStockRoutes);
   app.use(express.json({ limit: '64kb' }));

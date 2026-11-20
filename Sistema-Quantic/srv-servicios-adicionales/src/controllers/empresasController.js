@@ -1,17 +1,17 @@
-// =============================================================================
-// CONTROLADOR DE EMPRESAS
-// Microservicio: SRV-G5202605 - Quantic Technology S.A.C.
-// =============================================================================
+                                                                                
+                          
+                                                          
+                                                                                
 
 const EmpresaModel = require('../models/empresaModel');
 const ServicioModel = require('../models/servicioModel');
 
 class EmpresasController {
-  /**
-   * POST /api/v1/catalogo/empresas
-   * Registra una nueva solicitud de empresa proveedora.
-   * Flujo de negocio: Se guarda inicialmente con estado 'PENDIENTE'.
-   */
+     
+                                   
+                                                        
+                                                                     
+     
   static async registrarEmpresa(req, res) {
     try {
       const {
@@ -23,10 +23,10 @@ class EmpresasController {
         direccion,
         ciudad,
         descripcion,
-        servicios_iniciales // Array opcional de servicios enviados con la solicitud
+        servicios_iniciales                                                         
       } = req.body;
 
-      // 1. Validaciones básicas de campos obligatorios
+                                                       
       if (!razon_social || !ruc || !email_contacto || !telefono) {
         return res.status(400).json({
           status: 'error',
@@ -35,7 +35,7 @@ class EmpresasController {
         });
       }
 
-      // Validación de formato de RUC en el Perú (11 dígitos, inicia con 10, 15, 17 o 20 - SUNAT)
+                                                                                                 
       const rucLimpio = ruc.trim();
       if (!/^\d{11}$/.test(rucLimpio)) {
         return res.status(400).json({
@@ -52,7 +52,7 @@ class EmpresasController {
         });
       }
 
-      // Validación simple de email
+                                   
       if (!email_contacto.includes('@') || !email_contacto.includes('.')) {
         return res.status(400).json({
           status: 'error',
@@ -61,7 +61,7 @@ class EmpresasController {
         });
       }
 
-      // 2. Verificar que no exista una empresa con el mismo RUC
+                                                                
       const empresaExistente = await EmpresaModel.getByRuc(ruc.trim());
       if (empresaExistente) {
         return res.status(400).json({
@@ -71,7 +71,7 @@ class EmpresasController {
         });
       }
 
-      // 3. Crear empresa en estado PENDIENTE
+                                             
       const nuevaEmpresa = await EmpresaModel.create({
         razon_social: razon_social.trim(),
         ruc: ruc.trim(),
@@ -83,7 +83,7 @@ class EmpresasController {
         descripcion: descripcion ? descripcion.trim() : null
       });
 
-      // 4. Si se enviaron servicios iniciales junto a la solicitud, registrarlos como PENDIENTES
+                                                                                                 
       const serviciosCreados = [];
       if (Array.isArray(servicios_iniciales) && servicios_iniciales.length > 0) {
         for (const s of servicios_iniciales) {
@@ -120,13 +120,13 @@ class EmpresasController {
     }
   }
 
-  /**
-   * GET /api/v1/catalogo/empresas
-   * Consulta pública de empresas verificadas y aprobadas.
-   * Parámetros de consulta opcionales:
-   *  - q: Búsqueda por texto en razón social o descripción
-   *  - ciudad: Filtrado por ciudad (ej: Lima, Arequipa, Trujillo)
-   */
+     
+                                  
+                                                          
+                                       
+                                                           
+                                                                  
+     
   static async obtenerEmpresas(req, res) {
     try {
       const { q, ciudad } = req.query;
@@ -153,10 +153,10 @@ class EmpresasController {
     }
   }
 
-  /**
-   * GET /api/v1/catalogo/empresas/:id
-   * Consulta el detalle de una empresa y sus servicios aprobados.
-   */
+     
+                                      
+                                                                  
+     
   static async obtenerEmpresaPorId(req, res) {
     try {
       const { id } = req.params;
@@ -190,10 +190,10 @@ class EmpresasController {
     }
   }
 
-  /**
-   * GET /api/v1/catalogo/empresas/perfil/ruc/:ruc
-   * Acceso para que una empresa consulte su propio perfil y todos sus servicios (Portal Proveedor)
-   */
+     
+                                                  
+                                                                                                   
+     
   static async obtenerPerfilPorRuc(req, res) {
     try {
       const { ruc } = req.params;
@@ -207,7 +207,7 @@ class EmpresasController {
         });
       }
 
-      // La empresa en su portal privado puede ver TODOS sus servicios (aprobados, pendientes e inactivos)
+                                                                                                          
       const servicios = await ServicioModel.getByEmpresaId(empresa.id, false);
 
       return res.status(200).json({
@@ -229,10 +229,10 @@ class EmpresasController {
     }
   }
 
-  /**
-   * PUT /api/v1/catalogo/empresas/:id
-   * Actualiza datos de contacto y sede de la empresa (Autogestión de Proveedor)
-   */
+     
+                                      
+                                                                                
+     
   static async actualizarEmpresa(req, res) {
     try {
       const { id } = req.params;

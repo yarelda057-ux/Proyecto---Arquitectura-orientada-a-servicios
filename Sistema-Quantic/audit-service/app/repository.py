@@ -16,7 +16,7 @@ class Repository:
         self.collection.create_index([("source", ASCENDING), ("_id", DESCENDING)])
         self.collection.create_index([("source", ASCENDING), ("occurred_at", DESCENDING)])
         self.collection.create_index([("source", ASCENDING), ("actor_id", ASCENDING), ("_id", DESCENDING)])
-        # Sin retención automática por defecto. Solo los registros con expires_at caducan.
+                                                                                          
         self.collection.create_index("expires_at", expireAfterSeconds=0)
 
     def ping(self):

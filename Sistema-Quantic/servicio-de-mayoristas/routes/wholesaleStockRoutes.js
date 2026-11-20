@@ -1,3 +1,4 @@
+import { stockTemplate } from '../services/stockTemplate.js';
 import { presentationWorkbook } from '../presentationWorkbook.js';
 import { Router, mongoose, ExcelJS } from '../dependencies.js';
 
@@ -138,7 +139,7 @@ async function parseWorkbook(buffer) {
     if (cell.type === ExcelJS.ValueType.Formula || cell.value?.formula) formulaFound = true;
   }));
   if (formulaFound) throw error(400, 'La plantilla no admite fórmulas.');
-  // Localiza la primera cabecera completa aunque haya márgenes o títulos.
+                                                                          
   const required = ['partNumber', 'descripcion', 'cantidad', 'precioUsd'];
   let headerRow = 1;
   for (let rowIndex = 1; rowIndex <= Math.min(sheet.rowCount, 100); rowIndex++) {
@@ -180,7 +181,7 @@ async function parseWorkbook(buffer) {
     const partRaw = row[indices.partNumber];
     const qtyRaw = row[indices.cantidad];
     const priceRaw = row[indices.precioUsd];
-    // Las filas de título de categoría (por ejemplo, “Firewalls solo HW”) no son datos.
+                                                                                        
     if (!hasValue(partRaw) && !hasValue(qtyRaw) && !hasValue(priceRaw)) continue;
     totalFilas++;
     if (totalFilas > MAX_ROWS) throw error(413, `El archivo supera el máximo de ${MAX_ROWS} filas.`);
@@ -289,8 +290,8 @@ async function applyBatch(batch, actorId) {
     await session.withTransaction(async () => { result = await write(session); });
     return result;
   } catch (err) {
-    // MongoDB local puede ejecutarse sin replica set. Conservamos la operación funcional
-    // y el despliegue productivo usa la transacción anterior.
+                                                                                         
+                                                              
     if (!transactionsUnavailable(err)) throw err;
     return write(null);
   } finally {
@@ -300,6 +301,11 @@ async function applyBatch(batch, actorId) {
 
 const router = Router();
 router.use(validateAuth);
+router.get('/plantilla', async (req, res) => {
+  if (req.user.role !== 'mayorista') return res.status(403).json({ message: 'Solo los mayoristas pueden descargar la plantilla.' });
+  const buffer = await stockTemplate();
+  res.json({ nombreArchivo: 'plantilla-catalogo.xlsx', archivoBase64: buffer.toString('base64') });
+});
 router.get('/snapshot', requireAdmin, async (req,res,next)=>{
  try {
   const rows=await SupplierStock.find({}).sort({_id:1}).limit(100001).lean();
@@ -426,7 +432,7 @@ router.post('/upload', async (req, res) => {
     throw error(409, 'La clave de idempotencia ya fue usada con otro archivo.');
   }
   await Archive.create({ batchId: batch.batchId, data: buffer });
-  // El contrato devuelve 202 para que el consumidor siempre consulte la validación del lote.
+                                                                                             
   res.status(202).json({ idLote: batch.batchId, estado: 'RECIBIDO', estadoUrl: `/api/v1/stock/lotes/${batch.batchId}` });
 });
 

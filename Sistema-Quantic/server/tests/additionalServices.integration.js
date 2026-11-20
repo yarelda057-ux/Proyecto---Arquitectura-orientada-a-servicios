@@ -32,12 +32,12 @@ try {
   });
   const deadline = Date.now() + 10000; let ready = false;
   while (Date.now() < deadline) {
-    try { ready = (await fetch(`http://127.0.0.1:${esbPort}/health/live`)).ok; } catch { /* boot */ }
+    try { ready = (await fetch(`http://127.0.0.1:${esbPort}/health/live`)).ok; } catch {            }
     if (ready) break; await delay(100);
   }
   assert.ok(ready, 'ESB must start');
   const app = express();
-  // Autenticación simulada solo en esta prueba; el router de producción usa validateAuth.
+                                                                                          
   app.use('/catalog', createAdditionalServicesRouter({ authenticate(req, _res, next) { req.user = { role: req.get('X-Test-Role') || 'user' }; next(); } }));
   app.use('/protected', createAdditionalServicesRouter());
   gateway = http.createServer(app); const port = await listen(gateway); const base = `http://127.0.0.1:${port}`;

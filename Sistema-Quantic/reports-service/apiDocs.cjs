@@ -1,12 +1,12 @@
 const { readFileSync } = require('node:fs');
 
-// Self-contained so each service can be deployed without the repository root.
+                                                                              
 const SWAGGER_VERSION = '5.34.1';
 const CDN = `https://cdn.jsdelivr.net/npm/swagger-ui-dist@${SWAGGER_VERSION}`;
 
 function createApiDocs({ specPath, title, browserSession = false }) {
   const spec = JSON.parse(readFileSync(specPath, 'utf8'));
-  // Relative server keeps requests on the origin used to open the documentation.
+                                                                                 
   const contract = JSON.stringify({ ...spec, servers: [{ url: '/', description: 'Este servicio' }] });
   const safeTitle = title.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const html = `<!doctype html>
@@ -40,7 +40,7 @@ function createApiDocs({ specPath, title, browserSession = false }) {
     if (path === '/api-docs' || path === '/api-docs/') {
       res.statusCode = 302; res.setHeader('Location', '/docs'); res.end(); return true;
     }
-    // Override the API's restrictive CSP only for these documentation routes.
+                                                                              
     res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'");
     const json = path === '/openapi.json';
     const script = path === '/docs/swagger-initializer.js';

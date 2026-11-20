@@ -1,11 +1,11 @@
-// =============================================================================
-// MODELO / REPOSITORIO DE SERVICIOS
-// Microservicio: SRV-G5202605 - Quantic Technology S.A.C.
-// =============================================================================
+                                                                                
+                                    
+                                                          
+                                                                                
 
 const db = require('../config/db');
 
-// Datos de demostración en memoria para cuando MySQL aún no está configurado
+                                                                             
 let memoriaServicios = [
   {
     id: 1,
@@ -111,7 +111,7 @@ let memoriaServicios = [
 let nextServicioId = 10;
 
 class ServicioModel {
-  // Crear un nuevo servicio asociado a una empresa (Nace con estado PENDIENTE)
+                                                                               
   static async create({ empresa_id, nombre, descripcion, categoria, tipo_servicio, precio_referencial }) {
     const tipo = tipo_servicio || 'Híbrido (Presencial/Remoto)';
     const precio = precio_referencial || 'A cotizar';
@@ -141,7 +141,7 @@ class ServicioModel {
       };
     }
 
-    // Modo Demostración en memoria
+                                   
     const nuevoServicio = {
       id: nextServicioId++,
       empresa_id: parseInt(empresa_id, 10),
@@ -157,7 +157,7 @@ class ServicioModel {
     return nuevoServicio;
   }
 
-  // Obtener servicios públicos verificados (Solo aprobados, cuya empresa también esté aprobada)
+                                                                                                
   static async getPublicos({ categoria, q, ciudad, tipo_servicio } = {}, EmpresaModelRef) {
     if (db.isMySQLConnected()) {
       let sql = `
@@ -201,7 +201,7 @@ class ServicioModel {
       return await db.query(sql, params);
     }
 
-    // Modo Memoria
+                   
     const normalize = (str) => (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
     const empresasAprobadas = await EmpresaModelRef.getAprobadas();
@@ -237,7 +237,7 @@ class ServicioModel {
       });
   }
 
-  // Obtener servicios por ID de empresa
+                                        
   static async getByEmpresaId(empresaId, soloAprobados = true) {
     if (db.isMySQLConnected()) {
       let sql = `SELECT * FROM servicios WHERE empresa_id = ?`;
@@ -254,7 +254,7 @@ class ServicioModel {
       .filter(s => (soloAprobados ? s.estado === 'APROBADO' : true));
   }
 
-  // Obtener servicio por ID
+                            
   static async getById(id) {
     if (db.isMySQLConnected()) {
       const rows = await db.query(`SELECT * FROM servicios WHERE id = ?`, [id]);
@@ -263,7 +263,7 @@ class ServicioModel {
     return memoriaServicios.find(s => s.id === parseInt(id, 10)) || null;
   }
 
-  // Obtener todos los servicios (modo administración demo)
+                                                           
   static async getTodos({ estado, empresa_id } = {}) {
     if (db.isMySQLConnected()) {
       let sql = `
@@ -295,7 +295,7 @@ class ServicioModel {
     return resultado;
   }
 
-  // Actualizar estado de un servicio
+                                     
   static async updateEstado(id, nuevoEstado) {
     if (db.isMySQLConnected()) {
       await db.query(`UPDATE servicios SET estado = ? WHERE id = ?`, [nuevoEstado, id]);
@@ -308,7 +308,7 @@ class ServicioModel {
     return memoriaServicios[index];
   }
 
-  // Actualizar estado de todos los servicios de una empresa (ej: al aprobar la empresa)
+                                                                                        
   static async updateEstadoPorEmpresa(empresaId, nuevoEstado) {
     if (db.isMySQLConnected()) {
       await db.query(`UPDATE servicios SET estado = ? WHERE empresa_id = ?`, [nuevoEstado, empresaId]);
@@ -323,7 +323,7 @@ class ServicioModel {
     return true;
   }
 
-  // Actualizar datos de un servicio (nombre, categoría, modalidad, precio, descripción)
+                                                                                        
   static async updateDatos(id, { nombre, categoria, tipo_servicio, precio_referencial, descripcion }) {
     if (db.isMySQLConnected()) {
       await db.query(

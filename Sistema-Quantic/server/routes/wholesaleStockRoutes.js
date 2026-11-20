@@ -5,7 +5,7 @@ const router = Router();
 router.use(validateAuth);
 router.use(async (req, res) => {
   const token = req.user.role === 'mayorista' ? req.cookies[wholesaleCookie()] : delegationToken(req.user);
-  // Construimos la URL con prefijo fijo y solo reenviamos el contrato de stock.
+                                                                                
   const response = await wholesaleRequest('/api/v1/stock' + req.url, {
     method: req.method, token,
     ...(!['GET', 'HEAD'].includes(req.method) ? { body: req.body } : {}),

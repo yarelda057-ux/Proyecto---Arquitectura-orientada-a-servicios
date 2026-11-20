@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Inscribir mi empresa | Quantic</title><link rel="stylesheet" href="css/styles.css"></head>
+<body><main style="max-width: 1000px; margin: 2rem auto; padding: 1rem;">
+<h1>Forma parte del catálogo de servicios</h1><p>Presenta tu solicitud de manera independiente. La inscripción está sujeta a revisión y no concede acceso administrativo.</p>
+<div id="registrationStatus" role="status" aria-live="polite" tabindex="-1" style="padding: 1rem; margin: 1rem 0;" hidden></div>
+<section id="tab-registro-empresa" class="view-panel active">
+      <div class="elegant-form-card">
+        
+        <div class="form-header-badge">
+          <span class="sparkle">✦</span> INCORPORACIÓN DE PROVEEDORES
+        </div>
+        
+        <h2 class="form-title">Solicitud de Registro de Empresa</h2>
+        <p class="form-subtitle">
+          Complete los datos para postular su empresa al directorio comercial de Quantic Technology.
+        </p>
+
+        <div class="process-banner">
+          <div class="banner-icon-ring">⏳</div>
+          <div class="banner-text">
+            <strong>Flujo de Aprobación Obligatorio:</strong> Su solicitud se registrará con estado inicial 
+            <span class="status-pill-badge pill-pending">PENDIENTE</span>. 
+            Aparecerá en el directorio público una vez sea aprobada por un administrador.
+          </div>
+        </div>
+
+        <form id="formRegistroEmpresa" class="stylish-form">
+          
+          <h3 class="form-group-heading">1. Identificación y Contacto de la Empresa</h3>
+
+          <div class="form-grid-2">
+            <div class="input-field">
+              <label for="empRazonSocial">Razón Social o Nombre Comercial <span class="required">*</span></label>
+              <div class="input-box">
+                <span class="input-icon">🏢</span>
+                <input type="text" id="empRazonSocial" required placeholder="Ej: TechSolutions Andina S.A.C.">
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="empRuc">RUC (11 dígitos - SUNAT Perú) <span class="required">*</span></label>
+              <div class="input-box">
+                <span class="input-icon">📋</span>
+                <input type="text" id="empRuc" required maxlength="11" pattern="\d{11}" placeholder="Ej: 20601234567 (Inicia con 10 o 20)">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid-3">
+            <div class="input-field">
+              <label for="empEmail">Correo de Contacto <span class="required">*</span></label>
+              <div class="input-box">
+                <span class="input-icon">✉️</span>
+                <input type="email" id="empEmail" required placeholder="contacto@empresa.pe">
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="empTelefono">WhatsApp / Celular Comercial <span class="required">*</span></label>
+              <div class="input-box">
+                <span class="input-icon">📞</span>
+                <input type="tel" id="empTelefono" required placeholder="+51 987 654 321">
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="empCiudad">Región / Ciudad Sede <span class="required">*</span></label>
+              <div class="input-box">
+                <span class="input-icon">📍</span>
+                <select id="empCiudad" required>
+                  <option value="Lima">Lima y Callao</option>
+                  <option value="Arequipa">Arequipa</option>
+                  <option value="Trujillo">Trujillo (La Libertad)</option>
+                  <option value="Chiclayo">Chiclayo (Lambayeque)</option>
+                  <option value="Piura">Piura</option>
+                  <option value="Cusco">Cusco</option>
+                  <option value="Huancayo">Huancayo (Junín)</option>
+                  <option value="Iquitos">Iquitos (Loreto)</option>
+                  <option value="Tacna">Tacna</option>
+                  <option value="Chimbote">Chimbote (Áncash)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="input-field">
+              <label for="empDireccion">Dirección Física</label>
+              <div class="input-box">
+                <span class="input-icon">📌</span>
+                <input type="text" id="empDireccion" placeholder="Av. Los Ingenieros 340, Oficina 501">
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="empSitioWeb">Sitio Web Oficial</label>
+              <div class="input-box">
+                <span class="input-icon">🌐</span>
+                <input type="url" id="empSitioWeb" placeholder="https://www.empresa.pe">
+              </div>
+            </div>
+          </div>
+
+          <div class="input-field">
+            <label for="empDescripcion">Reseña o Descripción de la Empresa</label>
+            <div class="input-box">
+              <textarea id="empDescripcion" rows="3" placeholder="Detalle la experiencia, certificaciones o enfoque de su empresa..."></textarea>
+            </div>
+          </div>
+
+          <h3 class="form-group-heading">2. Primer Servicio a Registrar (Opcional)</h3>
+
+          <div class="form-grid-2">
+            <div class="input-field">
+              <label for="srvNombreIni">Título del Servicio</label>
+              <div class="input-box">
+                <span class="input-icon">⚡</span>
+                <input type="text" id="srvNombreIni" placeholder="Ej: Diagnóstico y Mantenimiento de Servidores">
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="srvCategoriaIni">Categoría</label>
+              <div class="input-box">
+                <span class="input-icon">📂</span>
+                <select id="srvCategoriaIni">
+                  <option value="Soporte técnico">Soporte técnico</option>
+                  <option value="Redes e infraestructura">Redes e infraestructura</option>
+                  <option value="Ciberseguridad">Ciberseguridad</option>
+                  <option value="Consultoría tecnológica">Consultoría tecnológica</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="input-field">
+              <label for="srvTipoIni">Modalidad de Prestación</label>
+              <div class="input-box">
+                <span class="input-icon">💻</span>
+                <select id="srvTipoIni">
+                  <option value="Presencial">Presencial</option>
+                  <option value="Remoto">Remoto</option>
+                  <option value="Híbrido">Híbrido</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-field">
+              <label for="srvPrecioIni">Precio Referencial</label>
+              <div class="input-box">
+                <span class="input-icon">💵</span>
+                <input type="text" id="srvPrecioIni" placeholder="Ej: Desde S/ 150 o A cotizar">
+              </div>
+            </div>
+          </div>
+
+          <div class="input-field">
+            <label for="srvDescIni">Detalle del Servicio</label>
+            <div class="input-box">
+              <textarea id="srvDescIni" rows="2" placeholder="Alcance, entregables y metodología del servicio..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-cta-row">
+            <button type="submit" class="btn-elegant-primary" id="btnEnviarEmpresa">
+              <span>Enviar Solicitud de Registro</span>
+              <span class="btn-arrow">→</span>
+            </button>
+            <button type="reset" class="btn-elegant-ghost">Restablecer Campos</button>
+          </div>
+
+        </form>
+      </div>
+    </section>
+</main><script src="js/inscribir-empresa.js" defer></script></body></html>

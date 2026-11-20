@@ -1,17 +1,17 @@
-// =============================================================================
-// CONTROLADOR DE SERVICIOS
-// Microservicio: SRV-G5202605 - Quantic Technology S.A.C.
-// =============================================================================
+                                                                                
+                           
+                                                          
+                                                                                
 
 const ServicioModel = require('../models/servicioModel');
 const EmpresaModel = require('../models/empresaModel');
 
 class ServiciosController {
-  /**
-   * POST /api/v1/catalogo/servicios
-   * Registra un nuevo servicio asociado a una empresa existente.
-   * Flujo de negocio: Se guarda inicialmente con estado 'PENDIENTE' de aprobación.
-   */
+     
+                                    
+                                                                 
+                                                                                   
+     
   static async registrarServicio(req, res) {
     try {
       const {
@@ -23,7 +23,7 @@ class ServiciosController {
         precio_referencial
       } = req.body;
 
-      // 1. Validaciones de campos obligatorios
+                                               
       if (!empresa_id || !nombre || !categoria) {
         return res.status(400).json({
           status: 'error',
@@ -32,7 +32,7 @@ class ServiciosController {
         });
       }
 
-      // 2. Verificar que la empresa exista
+                                           
       const empresa = await EmpresaModel.getById(empresa_id);
       if (!empresa) {
         return res.status(404).json({
@@ -42,7 +42,7 @@ class ServiciosController {
         });
       }
 
-      // 3. Crear el servicio con estado PENDIENTE
+                                                  
       const nuevoServicio = await ServicioModel.create({
         empresa_id,
         nombre: nombre.trim(),
@@ -68,15 +68,15 @@ class ServiciosController {
     }
   }
 
-  /**
-   * GET /api/v1/catalogo/servicios
-   * Consulta pública de servicios autorizados en el catálogo.
-   * Parámetros de consulta compatibles con la ficha técnica y ampliaciones documentadas:
-   *  - categoria: Filtra por categoría exacta (ej: 'Soporte técnico', 'Ciberseguridad')
-   *  - q: Búsqueda por palabra clave en título del servicio, descripción o nombre de la empresa
-   *  - ciudad: Filtra por ciudad de la empresa proveedora (ej: 'Lima', 'Arequipa')
-   *  - tipo_servicio: Filtra por modalidad (ej: 'Presencial', 'Remoto', 'Híbrido')
-   */
+     
+                                   
+                                                              
+                                                                                         
+                                                                                        
+                                                                                                
+                                                                                   
+                                                                                   
+     
   static async obtenerServicios(req, res) {
     try {
       const { categoria, q, ciudad, tipo_servicio } = req.query;
@@ -108,10 +108,10 @@ class ServiciosController {
     }
   }
 
-  /**
-   * GET /api/v1/catalogo/servicios/:id
-   * Obtiene la ficha de un servicio específico publicado.
-   */
+     
+                                       
+                                                          
+     
   static async obtenerServicioPorId(req, res) {
     try {
       const { id } = req.params;
@@ -145,10 +145,10 @@ class ServiciosController {
     }
   }
 
-  /**
-   * PUT /api/v1/catalogo/servicios/:id
-   * Actualiza los datos de un servicio tecnológico (nombre, categoría, modalidad, precio, descripción)
-   */
+     
+                                       
+                                                                                                       
+     
   static async actualizarServicio(req, res) {
     try {
       const { id } = req.params;

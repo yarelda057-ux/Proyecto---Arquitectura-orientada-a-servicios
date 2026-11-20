@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { createInterface } from 'node:readline/promises';
 import { Writable } from 'node:stream';
 import User from '../models/user.js';
-// Contraseña por entrada interactiva sin eco; no usar argumentos de shell ni logs.
+                                                                                   
 let hidden = false;
 const output = new Writable({ write(chunk, encoding, callback) { if (!hidden) process.stdout.write(chunk, encoding); callback(); } });
 const prompt = createInterface({ input: process.stdin, output, terminal: true });

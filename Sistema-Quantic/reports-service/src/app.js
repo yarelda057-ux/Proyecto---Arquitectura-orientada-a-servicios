@@ -70,7 +70,7 @@ export function createHandler({ clients, repository, source }) {
         }
         const data = await snapshot(expected);
         const result = repository.transaction(() => {
-          // Another request may have finished while the source was being fetched.
+                                                                                  
           const duplicate = repository.getUpdate(identity.clientId, idOperacion);
           if (duplicate) {
             if (duplicate.versionInventario !== expected) throw fail(409, 'Operacion reutilizada con otra version.');
@@ -113,7 +113,7 @@ export function createHandler({ clients, repository, source }) {
       const [, resource, id] = match;
       const existing = resource === 'dashboards' ? repository.getDashboard(identity.clientId, id) : repository.getReport(identity.clientId, id);
       if (!existing) throw fail(404, 'Recurso inexistente.');
-      // GET devuelve configuración o un reporte histórico: nunca lo etiqueta como vigente.
+                                                                                           
       if (req.method === 'GET') return send(200, { ...existing, historico: true });
       if (resource === 'dashboards' && req.method === 'PUT') {
         const config = dashboardInput(body, true); const data = await snapshot(config.versionInventario);
